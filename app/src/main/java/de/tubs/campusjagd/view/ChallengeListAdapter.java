@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.transition.TransitionManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,7 +36,7 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeViewHold
     /**
      * The expanded position
      */
-    protected int mExpandedPosition = -1;
+    private int mExpandedPosition = -1;
 
     /**
      * Constructor for the adaper
@@ -59,27 +60,39 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeViewHold
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ChallengeViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull ChallengeViewHolder holder, int position) {
         Challenge challenge = mChallenges.get(position);
 
         // Set name for challenge in view
         holder.challengeName.setText(challenge.getName());
 
+        //Add rooms to roomlist
+        // Set up recyclerview for rooms
+        holder.challengeRooms.setHasFixedSize(true);
+        LinearLayoutManager llm = new LinearLayoutManager(mContext);
+        holder.challengeRooms.setLayoutManager(llm);
+        // Bind adapter
+        holder.challengeRooms.setAdapter(new ChallengeItemRoomAdapter(challenge.getRoomList()));
+
+
         // Expansion of challenge when you click on it
         final boolean isExpanded = position == mExpandedPosition;
         holder.hiddenView.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
         holder.itemView.setActivated(isExpanded);
+        final int itemposition = holder.getAdapterPosition();
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mExpandedPosition = isExpanded ? -1 : position;
+                mExpandedPosition = isExpanded ? -1 : itemposition;
 
                 // You can add a transition later with (But you have to implement stuff here later
                 //TransitionManager.beginDelayedTransition(mRecyclerView);
 
-                notifyItemChanged(position);
+                notifyItemChanged(itemposition);
             }
         });
+
+
     }
 
     @Override
@@ -99,6 +112,9 @@ class ChallengeViewHolder extends RecyclerView.ViewHolder {
     // Expandable block
     View hiddenView;
 
+    // The RecyclerView holding all rooms
+    RecyclerView challengeRooms;
+
     /**
      * Viewholder for a challenge item
      * @param itemView View holding the item
@@ -108,5 +124,7 @@ class ChallengeViewHolder extends RecyclerView.ViewHolder {
 
         challengeName = itemView.findViewById(R.id.challenge_name);
         hiddenView = itemView.findViewById(R.id.hiddenView);
+        challengeRooms = itemView.findViewById(R.id.challenge_item_recyclerView);
     }
+
 }

@@ -10,12 +10,12 @@ public class ResourceMock {
 
     public ResourceMock() {
 
-        Room room1 = new Room(null, new GPS(), "Raum 161", 2, System.currentTimeMillis());
-        Room room2 = new Room(null, new GPS(), "Raum 31", 1, System.currentTimeMillis());
-        Room room3 = new Room(null, new GPS(), "Raum 74", 10, System.currentTimeMillis());
-        Room room4 = new Room(null, new GPS(), "Raum 111", 2, System.currentTimeMillis());
-        Room room5 = new Room(null, new GPS(), "Raum 142", 4, System.currentTimeMillis());
-        Room room6 = new Room(null, new GPS(), "Raum 262", 6, System.currentTimeMillis());
+        Room room1 = new Room(null, new GPS(), "Raum 161", 2, System.currentTimeMillis(), true);
+        Room room2 = new Room(null, new GPS(), "Raum 31", 1, System.currentTimeMillis(), false);
+        Room room3 = new Room(null, new GPS(), "Raum 74", 10, System.currentTimeMillis(), true);
+        Room room4 = new Room(null, new GPS(), "Raum 111", 2, System.currentTimeMillis(), false);
+        Room room5 = new Room(null, new GPS(), "Raum 142", 4, System.currentTimeMillis(),true);
+        Room room6 = new Room(null, new GPS(), "Raum 262", 6, System.currentTimeMillis(), false);
 
         ArrayList<Room> roomlist1 = new ArrayList<>();
         roomlist1.add(room1);
@@ -28,12 +28,20 @@ public class ResourceMock {
         roomlist1.add(room6);
         roomlist1.add(room1);
 
+        ArrayList<Room> roomlist3 = new ArrayList<>();
+        roomlist1.add(room5);
+        roomlist1.add(room6);
+        roomlist1.add(room1);
+
+
         Challenge challenge1 = new Challenge("MockChallenge 1", roomlist1);
         Challenge challenge2 = new Challenge("MockChallenge 2", roomlist2);
+        Challenge challenge3 = new Challenge("MockChallenge 3", roomlist3);
 
         allChallenges = new ArrayList<>();
         allChallenges.add(challenge1);
         allChallenges.add(challenge2);
+        allChallenges.add(challenge3);
     }
 
     public List<Challenge> getAllChallenges() {

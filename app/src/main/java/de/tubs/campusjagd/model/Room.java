@@ -7,13 +7,15 @@ public class Room {
     private String name;
     private int points;
     private long timestamp;
+    private boolean roomFound;
 
-    public Room(QRCode QRCode, GPS gps, String name, int points, long timestamp) {
+    public Room(QRCode QRCode, GPS gps, String name, int points, long timestamp, boolean roomFound) {
         this.QRCode = QRCode;
         this.gps = gps;
         this.name = name;
         this.points = points;
         this.timestamp = timestamp;
+        this.roomFound = roomFound;
     }
 
     public QRCode getQRCode() {
@@ -54,5 +56,13 @@ public class Room {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public boolean isRoomFound() {
+        return roomFound;
+    }
+
+    public void setRoomFound(boolean roomFound) {
+        this.roomFound = roomFound;
     }
 }
