@@ -18,7 +18,7 @@ import de.tubs.campusjagd.model.Room;
  *
  * @author leon.brettin@tu-bs.de
  */
-public class ChallengeItemRoomAdapter extends RecyclerView.Adapter<ChallengeItemRoomViewHolder> {
+public class RoomAdapter extends RecyclerView.Adapter<ItemRoomViewHolder> {
 
     /**
      * List holding our rooms for the adapter
@@ -26,7 +26,7 @@ public class ChallengeItemRoomAdapter extends RecyclerView.Adapter<ChallengeItem
     private List<Room> mRoomList;
 
 
-    public ChallengeItemRoomAdapter(List<Room> roomList) {
+    public RoomAdapter(List<Room> roomList) {
         mRoomList = roomList;
     }
 
@@ -39,10 +39,10 @@ public class ChallengeItemRoomAdapter extends RecyclerView.Adapter<ChallengeItem
      */
     @NonNull
     @Override
-    public ChallengeItemRoomViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
+    public ItemRoomViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_challenge_card_item, parent, false);
 
-        return new ChallengeItemRoomViewHolder(v);
+        return new ItemRoomViewHolder(v);
     }
 
     /**
@@ -52,7 +52,7 @@ public class ChallengeItemRoomAdapter extends RecyclerView.Adapter<ChallengeItem
      * @param position Position of the itemview in the adapter
      */
     @Override
-    public void onBindViewHolder(@NonNull ChallengeItemRoomViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ItemRoomViewHolder holder, int position) {
         Room room = mRoomList.get(position);
 
         holder.roomName.setText(room.getName());
@@ -69,12 +69,12 @@ public class ChallengeItemRoomAdapter extends RecyclerView.Adapter<ChallengeItem
 /**
  * Basic viewholder class for the items.
  */
-class ChallengeItemRoomViewHolder extends RecyclerView.ViewHolder{
+class ItemRoomViewHolder extends RecyclerView.ViewHolder{
 
     TextView roomName;
     CheckBox roomCheckBox;
 
-    ChallengeItemRoomViewHolder(@NonNull View itemView) {
+    ItemRoomViewHolder(@NonNull View itemView) {
         super(itemView);
 
         roomName = itemView.findViewById(R.id.challenge_item_room_name);

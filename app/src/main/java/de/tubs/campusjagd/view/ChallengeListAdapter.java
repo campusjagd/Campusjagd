@@ -2,8 +2,6 @@ package de.tubs.campusjagd.view;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
-import android.support.transition.TransitionManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -90,7 +88,7 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeViewHold
         LinearLayoutManager llm = new LinearLayoutManager(mContext);
         holder.challengeRooms.setLayoutManager(llm);
         // Bind adapter
-        holder.challengeRooms.setAdapter(new ChallengeItemRoomAdapter(challenge.getRoomList()));
+        holder.challengeRooms.setAdapter(new RoomAdapter(challenge.getRoomList()));
 
 
         // Expansion of challenge when you click on it

@@ -41,7 +41,7 @@ public class ChallengeListFragment extends Fragment {
      */
     private void init(View view) {
         //TODO Change this mock
-        ResourceMock resources = new ResourceMock();
+        ResourceMock resources = new ResourceMock(view.getContext());
         List<Challenge> challengeList = resources.getAllChallenges();
         // ------
 
