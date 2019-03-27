@@ -6,4 +6,11 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+
+
+    <!-- Menu items-->
+    <string name="menu_main">Hauptmenü</string>
+    <string name="menu_challenge_list">Alle Challenges</string>
+    <string name="menu_roomlist">Alle Räume</string>
+    <string name="menu_stats">Status</string>
 </resources>
