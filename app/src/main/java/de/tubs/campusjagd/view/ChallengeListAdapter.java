@@ -16,6 +16,11 @@ import java.util.List;
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.model.Challenge;
 
+/**
+ * Adapter holding our challenges
+ *
+ * @author leon.brettin@tu-bs.de
+ */
 public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeViewHolder> {
 
     /**
@@ -51,6 +56,13 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeViewHold
         mRecyclerView = holdingRecyclerView;
     }
 
+    /**
+     * Method which will be called when the view should be created.
+     *
+     * @param parent Parent view
+     * @param i We dont need this but its necessary for the API
+     * @return Inflated view
+     */
     @NonNull
     @Override
     public ChallengeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
@@ -59,6 +71,13 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeViewHold
         return new ChallengeViewHolder(v);
     }
 
+    /**
+     * Binds the values of our challenge list with our logic.
+     * We are binding attributes here and implementing the popup logic
+     *
+     * @param holder View holding our items
+     * @param position Position of the view in our list
+     */
     @Override
     public void onBindViewHolder(@NonNull ChallengeViewHolder holder, int position) {
         Challenge challenge = mChallenges.get(position);

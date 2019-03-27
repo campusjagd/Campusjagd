@@ -13,14 +13,30 @@ import java.util.List;
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.model.Room;
 
+/**
+ * Adapter for the rooms displayed for one challenge
+ *
+ * @author leon.brettin@tu-bs.de
+ */
 public class ChallengeItemRoomAdapter extends RecyclerView.Adapter<ChallengeItemRoomViewHolder> {
 
-    List<Room> mRoomList;
+    /**
+     * List holding our rooms for the adapter
+     */
+    private List<Room> mRoomList;
+
 
     public ChallengeItemRoomAdapter(List<Room> roomList) {
         mRoomList = roomList;
     }
 
+    /**
+     * Inflates the view for the single items
+     *
+     * @param parent Parent view
+     * @param i Counter which we dont need
+     * @return Inflated view item
+     */
     @NonNull
     @Override
     public ChallengeItemRoomViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
@@ -29,6 +45,12 @@ public class ChallengeItemRoomAdapter extends RecyclerView.Adapter<ChallengeItem
         return new ChallengeItemRoomViewHolder(v);
     }
 
+    /**
+     * Binds the view item with the attributes.
+     *
+     * @param holder Holding view for the item
+     * @param position Position of the itemview in the adapter
+     */
     @Override
     public void onBindViewHolder(@NonNull ChallengeItemRoomViewHolder holder, int position) {
         Room room = mRoomList.get(position);
@@ -44,13 +66,15 @@ public class ChallengeItemRoomAdapter extends RecyclerView.Adapter<ChallengeItem
     }
 }
 
+/**
+ * Basic viewholder class for the items.
+ */
 class ChallengeItemRoomViewHolder extends RecyclerView.ViewHolder{
 
     TextView roomName;
-
     CheckBox roomCheckBox;
 
-    public ChallengeItemRoomViewHolder(@NonNull View itemView) {
+    ChallengeItemRoomViewHolder(@NonNull View itemView) {
         super(itemView);
 
         roomName = itemView.findViewById(R.id.challenge_item_room_name);
