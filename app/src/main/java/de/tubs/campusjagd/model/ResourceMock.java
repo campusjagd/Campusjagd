@@ -24,14 +24,14 @@ public class ResourceMock {
         roomlist1.add(room4);
 
         ArrayList<Room> roomlist2 = new ArrayList<>();
-        roomlist1.add(room5);
-        roomlist1.add(room6);
-        roomlist1.add(room1);
+        roomlist2.add(room5);
+        roomlist2.add(room6);
+        roomlist2.add(room1);
 
         ArrayList<Room> roomlist3 = new ArrayList<>();
-        roomlist1.add(room5);
-        roomlist1.add(room6);
-        roomlist1.add(room1);
+        roomlist3.add(room5);
+        roomlist3.add(room6);
+        roomlist3.add(room1);
 
 
         Challenge challenge1 = new Challenge("MockChallenge 1", roomlist1);

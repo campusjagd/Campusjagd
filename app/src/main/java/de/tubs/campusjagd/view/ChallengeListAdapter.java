@@ -68,7 +68,6 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeViewHold
 
         //Add rooms to roomlist
         // Set up recyclerview for rooms
-        holder.challengeRooms.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(mContext);
         holder.challengeRooms.setLayoutManager(llm);
         // Bind adapter
