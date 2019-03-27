@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity
         mChallengeListFragment = new ChallengeListFragment();
         mRoomListFragment = new RoomListFragment();
 
+        // Add first fragment to the content holder
         getSupportFragmentManager().beginTransaction().add(R.id.contentHolder, mChallengeListFragment).commit();
     }
 
@@ -106,21 +107,24 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_main) {
             // Go to the challenge list fragment
+
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             //transaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_in_down, R.anim.slide_out_down, R.anim.slide_out_up);
             transaction.replace(R.id.contentHolder, mChallengeListFragment).commit();
 
         } else if (id == R.id.nav_challenge_list){
-
+            //TODO implement navigation to challenge list fragment
 
         } else if (id == R.id.nav_roomlist) {
             // Go to the room list fragment
+
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             //transaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_in_down, R.anim.slide_out_down, R.anim.slide_out_up);
             transaction.replace(R.id.contentHolder, mRoomListFragment);
             transaction.addToBackStack(null);
             transaction.commit();
         } else if (id == R.id.nav_stats) {
+            //TODO implement navigation to nav stats
 
         }
 
