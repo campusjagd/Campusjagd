@@ -25,11 +25,11 @@
 
         </android.support.design.widget.AppBarLayout>
 
-        <fragment
-            android:name="de.tubs.campusjagd.view.ChallengeListFragment"
-            android:id="@+id/challenge_list_fragment"
+        <FrameLayout
+            android:id="@+id/contentHolder"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     </LinearLayout>
 

@@ -3,6 +3,8 @@ package de.tubs.campusjagd;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,8 +15,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import de.tubs.campusjagd.view.ChallengeListFragment;
+import de.tubs.campusjagd.view.RoomListFragment;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    // All existing fragments
+    ChallengeListFragment mChallengeListFragment;
+    RoomListFragment mRoomListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +49,21 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        //-------------------------------------------
+
+        this.init();
+    }
+
+    /**
+     * Init special views
+     */
+    private void init() {
+        // Initialize fragments
+        mChallengeListFragment = new ChallengeListFragment();
+        mRoomListFragment = new RoomListFragment();
+
+        getSupportFragmentManager().beginTransaction().add(R.id.contentHolder, mChallengeListFragment).commit();
     }
 
     @Override
@@ -81,11 +105,21 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_main) {
+            // Go to the challenge list fragment
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            //transaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_in_down, R.anim.slide_out_down, R.anim.slide_out_up);
+            transaction.replace(R.id.contentHolder, mChallengeListFragment).commit();
 
         } else if (id == R.id.nav_challenge_list){
 
-        } else if (id == R.id.nav_roomlist) {
 
+        } else if (id == R.id.nav_roomlist) {
+            // Go to the room list fragment
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            //transaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_in_down, R.anim.slide_out_down, R.anim.slide_out_up);
+            transaction.replace(R.id.contentHolder, mRoomListFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
         } else if (id == R.id.nav_stats) {
 
         }
