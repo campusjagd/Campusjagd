@@ -1,4 +1,4 @@
-package de.tubs.campusjagd.view;
+package de.tubs.campusjagd.view.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;

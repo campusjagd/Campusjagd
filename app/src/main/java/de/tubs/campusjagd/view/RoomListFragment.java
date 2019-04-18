@@ -15,6 +15,7 @@ import java.util.List;
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.model.ResourceMock;
 import de.tubs.campusjagd.model.Room;
+import de.tubs.campusjagd.view.adapter.ExtendedRoomAdapter;
 
 /**
  * Fragment for the List of rooms.

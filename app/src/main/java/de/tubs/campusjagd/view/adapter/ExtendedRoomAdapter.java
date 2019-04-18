@@ -1,7 +1,6 @@
-package de.tubs.campusjagd.view;
+package de.tubs.campusjagd.view.adapter;
 
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
