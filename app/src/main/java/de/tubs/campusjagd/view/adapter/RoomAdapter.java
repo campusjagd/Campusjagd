@@ -25,9 +25,19 @@ public class RoomAdapter extends RecyclerView.Adapter<ItemRoomViewHolder> {
      */
     private List<Room> mRoomList;
 
+    /**
+     * Boolean value to determine if we should show the checkbox in the adapter
+     * Standard is true
+     */
+    private boolean mShowCheckBoxes = true;
 
     public RoomAdapter(List<Room> roomList) {
         mRoomList = roomList;
+    }
+
+    public RoomAdapter(List<Room> roomList, boolean showCheckboxes) {
+        mRoomList = roomList;
+        mShowCheckBoxes = showCheckboxes;
     }
 
     /**
@@ -57,6 +67,7 @@ public class RoomAdapter extends RecyclerView.Adapter<ItemRoomViewHolder> {
 
         holder.roomName.setText(room.getName());
         holder.roomCheckBox.setChecked(room.isRoomFound());
+        holder.roomCheckBox.setVisibility(mShowCheckBoxes ? View.VISIBLE : View.GONE);
 
     }
 

@@ -17,12 +17,14 @@ import android.view.MenuItem;
 
 import de.tubs.campusjagd.view.ChallengeListFragment;
 import de.tubs.campusjagd.view.RoomListFragment;
+import de.tubs.campusjagd.view.adapter.ChallengeCreateListAdapter;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     // All existing fragments
     ChallengeListFragment mChallengeListFragment;
+    ChallengeCreateListFragment mChallengeCreateListFragment;
     RoomListFragment mRoomListFragment;
 
     @Override
@@ -61,7 +63,9 @@ public class MainActivity extends AppCompatActivity
     private void init() {
         // Initialize fragments
         mChallengeListFragment = new ChallengeListFragment();
+        mChallengeCreateListFragment = new ChallengeCreateListFragment();
         mRoomListFragment = new RoomListFragment();
+
 
         // Add first fragment to the content holder
         getSupportFragmentManager().beginTransaction().add(R.id.contentHolder, mChallengeListFragment).commit();
@@ -113,7 +117,9 @@ public class MainActivity extends AppCompatActivity
             transaction.replace(R.id.contentHolder, mChallengeListFragment).commit();
 
         } else if (id == R.id.nav_challenge_list){
-            //TODO implement navigation to challenge list fragment
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            //transaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_in_down, R.anim.slide_out_down, R.anim.slide_out_up);
+            transaction.replace(R.id.contentHolder, mChallengeCreateListFragment).commit();
 
         } else if (id == R.id.nav_roomlist) {
             // Go to the room list fragment
