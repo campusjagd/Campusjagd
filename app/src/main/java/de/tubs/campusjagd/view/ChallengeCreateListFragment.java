@@ -53,7 +53,7 @@ public class ChallengeCreateListFragment extends Fragment {
         // Bind adapter
         challengeRecycleView.setAdapter(adapter);
 
-        mCreateNewChallengeFragment = new Fragment();
+        mCreateNewChallengeFragment = new CreateNewChallengeFragment();
 
         // Set up fab
         FloatingActionButton fab = view.findViewById(R.id.challenge_create_fab);
