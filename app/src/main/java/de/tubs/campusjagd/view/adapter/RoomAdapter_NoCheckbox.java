@@ -7,6 +7,9 @@ import java.util.List;
 
 import de.tubs.campusjagd.model.Room;
 
+/**
+ * RoomAdapter which adapts the basic {@link RoomAdapter} to show now checkboxes
+ */
 public class RoomAdapter_NoCheckbox extends RoomAdapter {
 
     public RoomAdapter_NoCheckbox(List<Room> roomList) {

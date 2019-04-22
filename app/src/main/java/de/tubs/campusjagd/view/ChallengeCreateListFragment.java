@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.tubs.campusjagd.R;
@@ -19,11 +20,17 @@ import de.tubs.campusjagd.etc.Logger;
 import de.tubs.campusjagd.model.Challenge;
 import de.tubs.campusjagd.model.ResourceMock;
 import de.tubs.campusjagd.view.adapter.ChallengeCreateListAdapter;
-import de.tubs.campusjagd.view.adapter.ChallengeListAdapter;
 
 public class ChallengeCreateListFragment extends Fragment {
 
+    // New Fragment which will be startet when the "+" button is pressed
     private Fragment mCreateNewChallengeFragment;
+
+    //Adapter holding all challenges
+    private ChallengeCreateListAdapter mAdapter;
+
+    // Resource class to acces resources
+    private ResourceMock mResources;
 
     @Nullable
     @Override
@@ -36,12 +43,11 @@ public class ChallengeCreateListFragment extends Fragment {
     }
 
     private void init(final View view) {
-        //TODO Change this mock
-        ResourceMock resources = new ResourceMock(view.getContext());
-        List<Challenge> challengeList = resources.getAllChallenges();
-        // ------
-
         RecyclerView challengeRecycleView = view.findViewById(R.id.challenge_create_recyclerview);
+
+        // Set up resources
+        //TODO Change this mock
+        mResources = ResourceMock.getInstance(view.getContext());
 
         // Set up recyclerview for challenges
         challengeRecycleView.setHasFixedSize(true);
@@ -49,9 +55,9 @@ public class ChallengeCreateListFragment extends Fragment {
         challengeRecycleView.setLayoutManager(llm);
 
         // Set up adapter
-        ChallengeCreateListAdapter adapter = new ChallengeCreateListAdapter(challengeList, view.getContext());
+        mAdapter = new ChallengeCreateListAdapter(new ArrayList<Challenge>(), view.getContext());
         // Bind adapter
-        challengeRecycleView.setAdapter(adapter);
+        challengeRecycleView.setAdapter(mAdapter);
 
         mCreateNewChallengeFragment = new CreateNewChallengeFragment();
 
@@ -63,7 +69,9 @@ public class ChallengeCreateListFragment extends Fragment {
                 try {
                     FragmentTransaction transaction = ChallengeCreateListFragment.this.getActivity()
                             .getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.contentHolder, mCreateNewChallengeFragment).commit();
+                    transaction.replace(R.id.contentHolder, mCreateNewChallengeFragment)
+                            .addToBackStack(ChallengeCreateListFragment.class.getSimpleName())
+                            .commit();
 
                 } catch (NullPointerException e) {
                     Logger.LogExeption(ChallengeCreateListFragment.class.getSimpleName(), "Error while starting new Fragment", e);
@@ -71,5 +79,12 @@ public class ChallengeCreateListFragment extends Fragment {
 
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        List<Challenge> challengeList = mResources.getAllChallenges();
+        mAdapter.exchangeAllChallenges(challengeList);
     }
 }

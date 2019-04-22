@@ -7,6 +7,15 @@ import java.util.List;
 
 public class ResourceMock {
 
+    private static ResourceMock mInstance;
+
+    public static ResourceMock getInstance(Context context) {
+        if (mInstance == null) {
+            mInstance = new ResourceMock(context);
+        }
+        return mInstance;
+    }
+
     private List<Challenge> allChallenges;
     private List<Room> allRooms;
 
@@ -60,5 +69,9 @@ public class ResourceMock {
 
     public List<Room> getAllRooms() {
         return allRooms;
+    }
+
+    public void saveChallenge(Challenge challenge){
+        allChallenges.add(challenge);
     }
 }

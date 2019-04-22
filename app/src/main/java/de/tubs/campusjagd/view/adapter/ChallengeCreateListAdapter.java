@@ -42,6 +42,16 @@ public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCr
         mContext = context;
     }
 
+    /**
+     * Adds a new list of challenges to the list
+     * The old list will be overwritten
+     * @param challenges New list of challenges to add
+     */
+    public void exchangeAllChallenges(List<Challenge> challenges){
+        mChallenges = challenges;
+        this.notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ChallengeCreateViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
