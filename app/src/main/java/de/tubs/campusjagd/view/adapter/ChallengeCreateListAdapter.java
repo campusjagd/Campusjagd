@@ -61,7 +61,7 @@ public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCr
         LinearLayoutManager llm = new LinearLayoutManager(mContext);
         holder.recyclerView.setLayoutManager(llm);
         // Bind adapter
-        holder.recyclerView.setAdapter(new RoomAdapter(challenge.getRoomList(), false));
+        holder.recyclerView.setAdapter(new RoomAdapter_NoCheckbox(challenge.getRoomList()));
 
         // Expansion of challenge when you click on it
         final boolean isExpanded = position == mExpandedPosition;

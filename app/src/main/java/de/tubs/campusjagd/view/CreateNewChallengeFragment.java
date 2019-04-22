@@ -18,6 +18,7 @@ import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.model.ResourceMock;
 import de.tubs.campusjagd.model.Room;
 import de.tubs.campusjagd.view.adapter.RoomAdapter;
+import de.tubs.campusjagd.view.adapter.RoomAdapter_SelectableCheckboxes;
 
 public class CreateNewChallengeFragment extends Fragment {
 
@@ -42,7 +43,7 @@ public class CreateNewChallengeFragment extends Fragment {
         LinearLayoutManager llm = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(llm);
 
-        RoomAdapter roomAdapter = new RoomAdapter(roomList);
+        RoomAdapter_SelectableCheckboxes roomAdapter = new RoomAdapter_SelectableCheckboxes(roomList);
         recyclerView.setAdapter(roomAdapter);
     }
 }
