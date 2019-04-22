@@ -19,7 +19,7 @@ public class ResourceMock {
     private List<Challenge> allChallenges;
     private List<Room> allRooms;
 
-    public ResourceMock(Context context) {
+    private ResourceMock(Context context) {
 
         Room room1 = new Room(null, new GPS(), "Raum 161", 2, System.currentTimeMillis(), true);
         Room room2 = new Room(null, new GPS(), "Raum 31", 1, System.currentTimeMillis(), false);

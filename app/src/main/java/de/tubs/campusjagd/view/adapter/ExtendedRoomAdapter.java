@@ -15,6 +15,13 @@ import java.util.List;
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.model.Room;
 
+/**
+ * Extend room adapter showing much more informations than just the basic {@link RoomAdapter}
+ * Because the implementation is much more complex I decided to give this adapter a own class
+ * instead of just extending it from the basic {@link RoomAdapter}.
+ *
+ * @author leon.brettin@tu-bs.de
+ */
 public class ExtendedRoomAdapter extends RecyclerView.Adapter<ItemExtendedRoomViewHolder> {
 
     /**
@@ -54,6 +61,7 @@ public class ExtendedRoomAdapter extends RecyclerView.Adapter<ItemExtendedRoomVi
     public void onBindViewHolder(@NonNull ItemExtendedRoomViewHolder holder, int position) {
         Room room = mRoomList.get(position);
 
+        // Bind holder with element from the list
         holder.roomName.setText(room.getName());
         holder.timestamp.setText(new Date(room.getTimestamp()).toString());
         holder.points.setText(Integer.toString(room.getPoints()));
@@ -99,7 +107,7 @@ class ItemExtendedRoomViewHolder extends RecyclerView.ViewHolder{
     ImageView qr;
     View hiddenView;
 
-    public ItemExtendedRoomViewHolder(@NonNull View itemView) {
+    ItemExtendedRoomViewHolder(@NonNull View itemView) {
         super(itemView);
 
         roomName = itemView.findViewById(R.id.item_extended_room_adapter_roomname);

@@ -19,6 +19,9 @@ import de.tubs.campusjagd.view.adapter.ChallengeListAdapter;
 
 /**
  * Fragment for the challenge list
+ * shows all challenges
+ *
+ * @author leon.brettin@tu-bs.de
  */
 public class ChallengeListFragment extends Fragment {
 
@@ -42,7 +45,7 @@ public class ChallengeListFragment extends Fragment {
      */
     private void init(View view) {
         //TODO Change this mock
-        ResourceMock resources = new ResourceMock(view.getContext());
+        ResourceMock resources = ResourceMock.getInstance(view.getContext());
         List<Challenge> challengeList = resources.getAllChallenges();
         // ------
 

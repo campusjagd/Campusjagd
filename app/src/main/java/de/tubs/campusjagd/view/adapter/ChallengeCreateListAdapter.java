@@ -15,6 +15,13 @@ import java.util.List;
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.model.Challenge;
 
+/**
+ * Adapter holding all challenges which should be created.
+ * I used a own adapter instead of extending it from {@link ChallengeListAdapter} because the
+ * functionality differs to much.
+ *
+ * @author leon.brettin@tu-bs.de
+ */
 public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCreateViewHolder> {
 
     /**

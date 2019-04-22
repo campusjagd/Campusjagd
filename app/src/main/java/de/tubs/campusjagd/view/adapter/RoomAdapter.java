@@ -14,7 +14,7 @@ import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.model.Room;
 
 /**
- * Adapter for the rooms displayed for one challenge
+ * Basic Adapter for the rooms displayed for one challenge
  *
  * @author leon.brettin@tu-bs.de
  */

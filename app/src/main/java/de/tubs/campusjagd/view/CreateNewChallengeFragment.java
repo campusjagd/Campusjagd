@@ -16,7 +16,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.tubs.campusjagd.MainActivity;
 import de.tubs.campusjagd.R;
+import de.tubs.campusjagd.etc.Logger;
 import de.tubs.campusjagd.model.Challenge;
 import de.tubs.campusjagd.model.ResourceMock;
 import de.tubs.campusjagd.model.Room;
@@ -25,6 +27,8 @@ import de.tubs.campusjagd.view.adapter.RoomAdapter_SelectableCheckboxes;
 
 /**
  * Fragment to create a new challenge by selecting rooms
+ *
+ * @author leon.brettin@tu-bs.de
  */
 public class CreateNewChallengeFragment extends Fragment {
 
@@ -52,7 +56,7 @@ public class CreateNewChallengeFragment extends Fragment {
      */
     private void init(View view) {
         // Init Resources
-        mResources = new ResourceMock(view.getContext());
+        mResources = ResourceMock.getInstance(view.getContext());
         List<Room> roomList = mResources.getAllRooms();
 
         // Get Fab and Recyclerview
@@ -71,9 +75,19 @@ public class CreateNewChallengeFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Create a new challenge and save it
                 CreateNewChallengeFragment.this.createNewChallenge();
 
-                CreateNewChallengeFragment.this.getActivity().getSupportFragmentManager().popBackStackImmediate();
+                // Go back to the previous fragment
+                try {
+                    CreateNewChallengeFragment.this.getActivity().getSupportFragmentManager().popBackStackImmediate();
+                } catch (NullPointerException e) {
+                    Logger.LogExeption(CreateNewChallengeFragment.class.getSimpleName(), "Error while going back to previous class", e);
+
+                    // We dont want our app to get stuck so we start the main activity (should not happen but just to be sure)
+                    MainActivity.startActivty(v.getContext());
+                }
+
             }
         });
     }

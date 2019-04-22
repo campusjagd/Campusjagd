@@ -21,6 +21,11 @@ import de.tubs.campusjagd.model.Challenge;
 import de.tubs.campusjagd.model.ResourceMock;
 import de.tubs.campusjagd.view.adapter.ChallengeCreateListAdapter;
 
+/**
+ * List of all challenges and the possibility to create a new challenge by clicking the "+" button
+ *
+ * @author leon.brettin@tu-bs.de
+ */
 public class ChallengeCreateListFragment extends Fragment {
 
     // New Fragment which will be startet when the "+" button is pressed

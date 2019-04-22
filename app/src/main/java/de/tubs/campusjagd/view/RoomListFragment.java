@@ -44,7 +44,7 @@ public class RoomListFragment extends Fragment {
      */
     private void init(View view) {
         //TODO replace this later
-        ResourceMock resourceMock = new ResourceMock(view.getContext());
+        ResourceMock resourceMock = ResourceMock.getInstance(view.getContext());
         mRoomList = resourceMock.getAllRooms();
         //-----
 
