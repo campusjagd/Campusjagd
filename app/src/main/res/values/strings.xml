@@ -15,4 +15,10 @@
     <string name="menu_stats">Status</string>
 
     <string name="create_challenge_name">Challenge Name</string>
+    <string name="create_room_name">Raumname</string>
+    <string name="create_room_name_hint">z.B. IZ 160</string>
+    <string name="create_room_points">Punkte</string>
+    <string name="create_room_points_hint">z.B. 10</string>
+    <string name="create_room_button_name">Setze GPS</string>
+
 </resources>

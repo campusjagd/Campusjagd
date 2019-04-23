@@ -3,7 +3,9 @@ package de.tubs.campusjagd.view;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,6 +15,7 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import de.tubs.campusjagd.R;
+import de.tubs.campusjagd.etc.Logger;
 import de.tubs.campusjagd.model.ResourceMock;
 import de.tubs.campusjagd.model.Room;
 import de.tubs.campusjagd.view.adapter.ExtendedRoomAdapter;
@@ -26,6 +29,9 @@ public class RoomListFragment extends Fragment {
 
     // List of all rooms which should be displayed
     List<Room> mRoomList;
+
+    //Fragment to start when a new room should be created
+    private Fragment mCreateNewRoomFragment;
 
     @Nullable
     @Override
@@ -58,6 +64,28 @@ public class RoomListFragment extends Fragment {
         // We reuse the adapter from the challenge list here. If we need more special styling we can create a new one.
         ExtendedRoomAdapter roomAdapter = new ExtendedRoomAdapter(mRoomList);
         roomRecyclerView.setAdapter(roomAdapter);
+
+        // Set up fragment
+        mCreateNewRoomFragment = new CreateNewRoomFragment();
+
+        //Set up fab
+        FloatingActionButton fab = view.findViewById(R.id.roomfragment_fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    FragmentTransaction transaction = RoomListFragment.this.getActivity()
+                            .getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.contentHolder, mCreateNewRoomFragment)
+                            .addToBackStack(ChallengeCreateListFragment.class.getSimpleName())
+                            .commit();
+
+                } catch (NullPointerException e) {
+                    Logger.LogExeption(ChallengeCreateListFragment.class.getSimpleName(), "Error while starting new Fragment", e);
+                }
+            }
+        });
+
 
     }
 }
