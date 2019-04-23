@@ -1,6 +1,7 @@
 package de.tubs.campusjagd.view;
 
 import android.app.Activity;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,14 +16,31 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Date;
+
 import de.tubs.campusjagd.MainActivity;
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.etc.Logger;
+import de.tubs.campusjagd.gps.CJLocationManager;
+import de.tubs.campusjagd.model.GPS;
+import de.tubs.campusjagd.model.Resources;
+import de.tubs.campusjagd.model.Room;
 
+/**
+ * Fragment to create a new room
+ *
+ * @author leon.brettin@tu-bs.de
+ */
 public class CreateNewRoomFragment extends Fragment {
 
-    private EditText mPointsEditText;
+    // Edit text holding the name of the room
     private EditText mNameEditText;
+    // Edit text holding the number of points
+    private EditText mPointsEditText;
+    // Text showing the
+    private TextView mGPSText;
+    // Actual found gps position
+    private GPS mGPSPosition;
 
     @Nullable
     @Override
@@ -34,6 +52,10 @@ public class CreateNewRoomFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Inits all elements of the fragment
+     * @param view The holding {@link View}
+     */
     private void init(View view) {
 
         // Get Elements out of the view
@@ -41,13 +63,15 @@ public class CreateNewRoomFragment extends Fragment {
         mNameEditText = view.findViewById(R.id.create_room_name_edit_text);
         mPointsEditText = view.findViewById(R.id.create_room_points_edit_text);
         Button gpsButton = view.findViewById(R.id.create_room_set_gps_button);
-        TextView gpsText = view.findViewById(R.id.create_room_gps_string);
+        mGPSText = view.findViewById(R.id.create_room_gps_string);
 
+        // Set up the button to add a new room
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Create a new room and save it
                 if (CreateNewRoomFragment.this.createNewRoom()) {
+
                     // Go back to the previous fragment
                     try {
                         hideKeyboard(CreateNewRoomFragment.this.getActivity());
@@ -62,6 +86,24 @@ public class CreateNewRoomFragment extends Fragment {
                 }
             }
         });
+
+        // Set up the GPS button
+        gpsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CJLocationManager locationManager = new CJLocationManager();
+                locationManager.getLocation(CreateNewRoomFragment.this.getActivity(), new CJLocationManager.LocationCallback() {
+                    @Override
+                    public void onNewLocationAvailable(GPS location) {
+                        mGPSPosition = location;
+
+                        mGPSText.setText(mGPSPosition.toString());
+                        mGPSText.setVisibility(View.VISIBLE);
+                    }
+                });
+
+            }
+        });
     }
 
     /**
@@ -69,18 +111,18 @@ public class CreateNewRoomFragment extends Fragment {
      * @return True, when all values are good and the room is saved successfully.
      */
     private boolean createNewRoom() {
-        boolean successFull = true;
-
         // Get roomName
         String roomName = mNameEditText.getText().toString();
         if (roomName.equals("")){
-            successFull = false;
             Toast.makeText(this.getContext(), R.string.create_room_no_name_error, Toast.LENGTH_LONG).show();
+
+            return false;
         }
 
         // Get points
+        int points;
         try {
-            int points = Integer.parseInt(mPointsEditText.getText().toString());
+            points = Integer.parseInt(mPointsEditText.getText().toString());
 
         } catch (NumberFormatException e) {
 
@@ -89,12 +131,20 @@ public class CreateNewRoomFragment extends Fragment {
             Toast.makeText(this.getContext(), R.string.create_room_parse_point_error, Toast.LENGTH_LONG).show();
             mPointsEditText.getText().clear();
 
-            successFull = false;
+            return false;
         }
 
+        if (mGPSPosition == null) {
+            Toast.makeText(this.getContext(), R.string.create_room_no_gps_error, Toast.LENGTH_LONG).show();
 
+            return false;
+        }
 
-        return successFull;
+        // Every value is set up correctly
+        Room room = new Room(null, mGPSPosition, roomName, points, new Date().getTime(), false);
+        Resources.getInstance(this.getContext()).saveRoom(room);
+
+        return true;
     }
 
     /**
