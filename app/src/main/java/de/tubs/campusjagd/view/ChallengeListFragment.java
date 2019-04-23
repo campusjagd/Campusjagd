@@ -14,7 +14,7 @@ import java.util.List;
 
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.model.Challenge;
-import de.tubs.campusjagd.model.ResourceMock;
+import de.tubs.campusjagd.model.Resources;
 import de.tubs.campusjagd.view.adapter.ChallengeListAdapter;
 
 /**
@@ -45,7 +45,7 @@ public class ChallengeListFragment extends Fragment {
      */
     private void init(View view) {
         //TODO Change this mock
-        ResourceMock resources = ResourceMock.getInstance(view.getContext());
+        Resources resources = Resources.getInstance(view.getContext());
         List<Challenge> challengeList = resources.getAllChallenges();
         // ------
 

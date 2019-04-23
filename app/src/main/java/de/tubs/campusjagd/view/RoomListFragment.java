@@ -16,7 +16,7 @@ import java.util.List;
 
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.etc.Logger;
-import de.tubs.campusjagd.model.ResourceMock;
+import de.tubs.campusjagd.model.Resources;
 import de.tubs.campusjagd.model.Room;
 import de.tubs.campusjagd.view.adapter.ExtendedRoomAdapter;
 
@@ -50,8 +50,8 @@ public class RoomListFragment extends Fragment {
      */
     private void init(View view) {
         //TODO replace this later
-        ResourceMock resourceMock = ResourceMock.getInstance(view.getContext());
-        mRoomList = resourceMock.getAllRooms();
+        Resources resources = Resources.getInstance(view.getContext());
+        mRoomList = resources.getAllRooms();
         //-----
 
         // Setup room list

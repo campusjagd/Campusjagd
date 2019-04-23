@@ -10,7 +10,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -20,9 +19,8 @@ import de.tubs.campusjagd.MainActivity;
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.etc.Logger;
 import de.tubs.campusjagd.model.Challenge;
-import de.tubs.campusjagd.model.ResourceMock;
+import de.tubs.campusjagd.model.Resources;
 import de.tubs.campusjagd.model.Room;
-import de.tubs.campusjagd.view.adapter.RoomAdapter;
 import de.tubs.campusjagd.view.adapter.RoomAdapter_SelectableCheckboxes;
 
 /**
@@ -33,7 +31,7 @@ import de.tubs.campusjagd.view.adapter.RoomAdapter_SelectableCheckboxes;
 public class CreateNewChallengeFragment extends Fragment {
 
     //Resources to save and get data from
-    ResourceMock mResources;
+    Resources mResources;
 
     // EditText view holding the challenge name
     TextView mChallengeNameEditText;
@@ -56,7 +54,7 @@ public class CreateNewChallengeFragment extends Fragment {
      */
     private void init(View view) {
         // Init Resources
-        mResources = ResourceMock.getInstance(view.getContext());
+        mResources = Resources.getInstance(view.getContext());
         List<Room> roomList = mResources.getAllRooms();
 
         // Get Fab and Recyclerview

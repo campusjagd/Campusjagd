@@ -18,7 +18,7 @@ import java.util.List;
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.etc.Logger;
 import de.tubs.campusjagd.model.Challenge;
-import de.tubs.campusjagd.model.ResourceMock;
+import de.tubs.campusjagd.model.Resources;
 import de.tubs.campusjagd.view.adapter.ChallengeCreateListAdapter;
 
 /**
@@ -35,7 +35,7 @@ public class ChallengeCreateListFragment extends Fragment {
     private ChallengeCreateListAdapter mAdapter;
 
     // Resource class to acces resources
-    private ResourceMock mResources;
+    private Resources mResources;
 
     @Nullable
     @Override
@@ -52,7 +52,7 @@ public class ChallengeCreateListFragment extends Fragment {
 
         // Set up resources
         //TODO Change this mock
-        mResources = ResourceMock.getInstance(view.getContext());
+        mResources = Resources.getInstance(view.getContext());
 
         // Set up recyclerview for challenges
         challengeRecycleView.setHasFixedSize(true);

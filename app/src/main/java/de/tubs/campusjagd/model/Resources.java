@@ -5,13 +5,13 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ResourceMock {
+public class Resources {
 
-    private static ResourceMock mInstance;
+    private static Resources mInstance;
 
-    public static ResourceMock getInstance(Context context) {
+    public static Resources getInstance(Context context) {
         if (mInstance == null) {
-            mInstance = new ResourceMock(context);
+            mInstance = new Resources(context);
         }
         return mInstance;
     }
@@ -19,7 +19,7 @@ public class ResourceMock {
     private List<Challenge> allChallenges;
     private List<Room> allRooms;
 
-    private ResourceMock(Context context) {
+    private Resources(Context context) {
 
         Room room1 = new Room(null, new GPS(), "Raum 161", 2, System.currentTimeMillis(), true);
         Room room2 = new Room(null, new GPS(), "Raum 31", 1, System.currentTimeMillis(), false);
