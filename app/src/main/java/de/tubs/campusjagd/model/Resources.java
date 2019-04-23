@@ -74,4 +74,8 @@ public class Resources {
     public void saveChallenge(Challenge challenge){
         allChallenges.add(challenge);
     }
+
+    public void saveRoom(Room room) {
+        allRooms.add(room);
+    }
 }
