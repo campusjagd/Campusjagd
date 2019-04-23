@@ -1,11 +1,15 @@
 package de.tubs.campusjagd;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,7 +19,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import de.tubs.campusjagd.etc.PermissionManager;
 import de.tubs.campusjagd.view.ChallengeCreateListFragment;
 import de.tubs.campusjagd.view.ChallengeListFragment;
 import de.tubs.campusjagd.view.RoomListFragment;
@@ -56,8 +62,8 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         //-------------------------------------------
-
         this.init();
+
     }
 
     /**
@@ -72,6 +78,23 @@ public class MainActivity extends AppCompatActivity
 
         // Add first fragment to the content holder
         getSupportFragmentManager().beginTransaction().add(R.id.contentHolder, mChallengeListFragment).commit();
+
+        PermissionManager.checkPermissions(this);
+    }
+
+    /**
+     * Wait until permission is granted, then check if all permissions are really granted.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        boolean fineLocationPermissionGranted = PermissionManager.checkAccessFineLocation(this);
+        boolean coarseLoctationPermissionGranted = PermissionManager.checkAccessCoarseLocation(this);
+
+        if (!fineLocationPermissionGranted && !coarseLoctationPermissionGranted) {
+            Toast.makeText(this, R.string.no_permissions_granted, Toast.LENGTH_LONG).show();
+
+        }
+
     }
 
     @Override

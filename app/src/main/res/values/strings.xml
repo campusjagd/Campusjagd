@@ -23,5 +23,6 @@
     <string name="create_room_parse_point_error">Fehler beim Lesen der Punkte.</string>
     <string name="create_room_no_name_error">Kein Name wurde eingegeben</string>
 
+    <string name="no_permissions_granted">Ohne die GPS Daten kann die App nicht richtig funktionieren :-/</string>
 
 </resources>
