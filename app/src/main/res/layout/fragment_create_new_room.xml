@@ -13,6 +13,7 @@
         android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
         android:ems="10"
+        android:imeOptions="actionDone"
         android:inputType="textPersonName"
         android:hint="@string/create_room_name_hint"
         app:layout_constraintEnd_toEndOf="parent"
@@ -44,6 +45,7 @@
 
     <EditText
         android:id="@+id/create_room_points_edit_text"
+        android:imeOptions="actionDone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"

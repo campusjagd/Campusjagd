@@ -20,5 +20,8 @@
     <string name="create_room_points">Punkte</string>
     <string name="create_room_points_hint">z.B. 10</string>
     <string name="create_room_button_name">Setze GPS</string>
+    <string name="create_room_parse_point_error">Fehler beim Lesen der Punkte.</string>
+    <string name="create_room_no_name_error">Kein Name wurde eingegeben</string>
+
 
 </resources>
