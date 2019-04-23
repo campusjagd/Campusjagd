@@ -6,13 +6,18 @@ import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
+/**
+ * Permission Manager to handle permission requests and checks for permissions
+ *
+ * @author leon.brettin@tu-bs.de
+ */
 public class PermissionManager {
 
     /**
      * Check for all needed permissions.
      * If not ask for permissions
      */
-    public static void checkPermissions(Activity activity) {
+    public static boolean checkPermissions(Activity activity) {
         boolean fineLocationPermissionGranted = checkAccessFineLocation(activity);
         boolean coarseLoctationPermissionGranted = checkAccessCoarseLocation(activity);
 
@@ -21,8 +26,11 @@ public class PermissionManager {
 
         } else if (!coarseLoctationPermissionGranted) {
             ActivityCompat.requestPermissions(activity, new String [] {Manifest.permission.ACCESS_COARSE_LOCATION}, 14141);
+        } else {
+            return true;
         }
 
+        return false;
     }
 
     /**
