@@ -19,6 +19,7 @@ import de.tubs.campusjagd.gps.CJLocationManager;
 import de.tubs.campusjagd.view.ChallengeCreateListFragment;
 import de.tubs.campusjagd.view.ChallengeListFragment;
 import de.tubs.campusjagd.view.RoomListFragment;
+import de.tubs.campusjagd.view.StatsFragment;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity
     ChallengeListFragment mChallengeListFragment;
     ChallengeCreateListFragment mChallengeCreateListFragment;
     RoomListFragment mRoomListFragment;
+    StatsFragment mStatsFragment;
 
     /**
      * Starts this activity
@@ -68,6 +70,7 @@ public class MainActivity extends AppCompatActivity
         mChallengeListFragment = new ChallengeListFragment();
         mChallengeCreateListFragment = new ChallengeCreateListFragment();
         mRoomListFragment = new RoomListFragment();
+        mStatsFragment = new StatsFragment();
 
 
         // Add first fragment to the content holder
@@ -150,8 +153,8 @@ public class MainActivity extends AppCompatActivity
             transaction.addToBackStack(null);
             transaction.commit();
         } else if (id == R.id.nav_stats) {
-            //TODO implement navigation to nav stats
-
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.contentHolder, mStatsFragment).commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
