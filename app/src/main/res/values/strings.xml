@@ -25,6 +25,8 @@
     <string name="create_room_no_gps_error">Keine GPS Position gesetzt</string>
 
     <string name="no_permissions_granted">Ohne die GPS Daten kann die App nicht richtig funktionieren :-/</string>
+    <string name="ask_to_save_qr">QR-Code speichern?</string>
+    <string name="cancel">Abbrechen</string>
 
     <!-- Barcode Strings-->
     <string name="ok">OK</string>
@@ -41,5 +43,6 @@
     <string name="barcode_error">"Error reading barcode: %1$s"</string>
 
     <string name="barcode_success_toast">QR-Code gefunden</string>
+
 
 </resources>

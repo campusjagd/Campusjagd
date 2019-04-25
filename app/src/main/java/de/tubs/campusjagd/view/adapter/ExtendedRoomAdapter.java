@@ -1,9 +1,11 @@
 package de.tubs.campusjagd.view.adapter;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.ContextWrapper;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -23,9 +25,6 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
@@ -69,6 +68,10 @@ public class ExtendedRoomAdapter extends RecyclerView.Adapter<ItemExtendedRoomVi
      */
     private Activity mActivity;
 
+    /**
+     * The bitmap of the qr code
+     */
+    private Bitmap mBitmap;
 
     /**
      * Inflates the view for the single items
@@ -95,12 +98,12 @@ public class ExtendedRoomAdapter extends RecyclerView.Adapter<ItemExtendedRoomVi
         holder.points.setText(Integer.toString(room.getPoints()));
         holder.gpsPosition.setText("GPS: " + room.getGps().toString());
         holder.checkBox.setChecked(room.isRoomFound());
-        final Bitmap bitmap = generateQR(holder.qr, room.toString());
+        mBitmap = generateQR(holder.qr, room.toString());
 
         holder.qr.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveToFile(bitmap);
+                ExtendedRoomAdapter.this.createSaveFileDialog().show();
             }
         });
 
@@ -120,6 +123,27 @@ public class ExtendedRoomAdapter extends RecyclerView.Adapter<ItemExtendedRoomVi
                 notifyItemChanged(itemposition);
             }
         });
+    }
+
+    /**
+     * Creates a Dialog to ask if the bitmap can be saved
+     * @return Dialog to show
+     */
+    private Dialog createSaveFileDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+        builder.setMessage(R.string.ask_to_save_qr)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Be careful that you get the right bitmap
+                        saveToFile(mBitmap);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Do nothing
+                    }
+                });
+        return builder.create();
     }
 
     @Override
@@ -184,8 +208,8 @@ public class ExtendedRoomAdapter extends RecyclerView.Adapter<ItemExtendedRoomVi
         if (writeWasSuccessFull) {
             Intent i = new Intent(Intent.ACTION_VIEW,
                     path);
-            final int ACTIVITY_SELECT_IMAGE = 1234;
-            mActivity.startActivityForResult(i, ACTIVITY_SELECT_IMAGE);
+            final int ACTION_VIEW_IMAGE = 1234;
+            mActivity.startActivityForResult(i, ACTION_VIEW_IMAGE);
         }
     }
 }
