@@ -62,7 +62,7 @@ public class RoomListFragment extends Fragment {
 
         //Set up adapter
         // We reuse the adapter from the challenge list here. If we need more special styling we can create a new one.
-        ExtendedRoomAdapter roomAdapter = new ExtendedRoomAdapter(mRoomList);
+        ExtendedRoomAdapter roomAdapter = new ExtendedRoomAdapter(mRoomList, RoomListFragment.this.getActivity());
         roomRecyclerView.setAdapter(roomAdapter);
 
         // Set up fragment

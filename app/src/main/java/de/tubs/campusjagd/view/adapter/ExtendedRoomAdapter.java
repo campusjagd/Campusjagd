@@ -1,6 +1,13 @@
 package de.tubs.campusjagd.view.adapter;
 
+import android.app.Activity;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -16,11 +23,17 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.List;
 
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.etc.Logger;
+import de.tubs.campusjagd.etc.PermissionManager;
 import de.tubs.campusjagd.model.Room;
 
 /**
@@ -36,7 +49,8 @@ public class ExtendedRoomAdapter extends RecyclerView.Adapter<ItemExtendedRoomVi
      * Basic constructor
      * @param roomList List with all rooms to show
      */
-    public ExtendedRoomAdapter(List<Room> roomList) {
+    public ExtendedRoomAdapter(List<Room> roomList, Activity activity) {
+        mActivity = activity;
         mRoomList = roomList;
     }
 
@@ -49,6 +63,12 @@ public class ExtendedRoomAdapter extends RecyclerView.Adapter<ItemExtendedRoomVi
      * The position of the expanded element
      */
     private int mExpandedPosition = -1;
+
+    /**
+     * The {@link Context}
+     */
+    private Activity mActivity;
+
 
     /**
      * Inflates the view for the single items
@@ -75,7 +95,14 @@ public class ExtendedRoomAdapter extends RecyclerView.Adapter<ItemExtendedRoomVi
         holder.points.setText(Integer.toString(room.getPoints()));
         holder.gpsPosition.setText("GPS: " + room.getGps().toString());
         holder.checkBox.setChecked(room.isRoomFound());
-        generateQR(holder.qr, room.toString());
+        final Bitmap bitmap = generateQR(holder.qr, room.toString());
+
+        holder.qr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveToFile(bitmap);
+            }
+        });
 
         // Expansion of challenge when you click on it
         final boolean isExpanded = position == mExpandedPosition;
@@ -100,16 +127,65 @@ public class ExtendedRoomAdapter extends RecyclerView.Adapter<ItemExtendedRoomVi
         return mRoomList.size();
     }
 
-    private void generateQR(ImageView imageView, String text) {
+    /**
+     * Generates a qr code for the room
+     * @param imageView Imageview to display the qr code
+     * @param text Text to generate into qr
+     */
+    private Bitmap generateQR(ImageView imageView, String text) {
+        Bitmap bitmap = null;
+
         MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
         try {
             BitMatrix bitMatrix = multiFormatWriter.encode(text, BarcodeFormat.QR_CODE,400,400);
             BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-            Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
+           bitmap = barcodeEncoder.createBitmap(bitMatrix);
             imageView.setImageBitmap(bitmap);
         } catch (WriterException e) {
             Logger.LogExeption(ExtendedRoomAdapter.class.getSimpleName(), "Unable to write QR", e);
 
+        }
+
+        return bitmap;
+    }
+
+    /**
+     * Saves a bitmap to a file
+     * @param bitmap Bitmap to save
+     */
+    private void saveToFile(Bitmap bitmap) {
+        // Ask for write permission
+        if (!PermissionManager.checkAccessWriteExternalStorage(mActivity)) {
+            PermissionManager.askPermissionWrite(mActivity);
+        }
+
+        // If we still dont have it return
+        if (!PermissionManager.checkAccessWriteExternalStorage(mActivity)) {
+            return;
+        }
+
+        //  Write image
+        Uri path = mActivity.getContentResolver().insert (MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new ContentValues());
+        boolean writeWasSuccessFull = false;
+        try
+        {
+            OutputStream stream = mActivity.getContentResolver ().openOutputStream (path);
+            bitmap.compress (Bitmap.CompressFormat.JPEG, 90, stream);
+            if (stream != null) {
+                stream.close();
+            }
+            writeWasSuccessFull = true;
+        }
+        catch (IOException e){
+            Logger.LogExeption(ExtendedRoomAdapter.class.getSimpleName(),"Unable to write file", e);
+        }
+
+        // Start Galery
+        if (writeWasSuccessFull) {
+            Intent i = new Intent(Intent.ACTION_VIEW,
+                    path);
+            final int ACTIVITY_SELECT_IMAGE = 1234;
+            mActivity.startActivityForResult(i, ACTIVITY_SELECT_IMAGE);
         }
     }
 }
