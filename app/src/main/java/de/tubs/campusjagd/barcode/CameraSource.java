@@ -1,4 +1,4 @@
-package de.tubs.campusjagd;
+package de.tubs.campusjagd.barcode;
 
 /*
  * Copyright (C) The Android Open Source Project

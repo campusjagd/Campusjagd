@@ -29,8 +29,6 @@ import com.google.android.gms.common.images.Size;
 
 import java.io.IOException;
 
-import de.tubs.campusjagd.CameraSource;
-
 public class CameraSourcePreview extends ViewGroup {
     private static final String TAG = "CameraSourcePreview";
 

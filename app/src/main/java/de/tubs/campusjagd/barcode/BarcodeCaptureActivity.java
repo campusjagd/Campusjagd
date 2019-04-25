@@ -48,8 +48,8 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.IOException;
 
-import de.tubs.campusjagd.CameraSource;
 import de.tubs.campusjagd.R;
+import de.tubs.campusjagd.etc.Logger;
 
 /**
  * Activity for the multi-tracker app.  This app detects barcodes and displays the value with the
@@ -104,10 +104,6 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
 
         gestureDetector = new GestureDetector(this, new CaptureGestureListener());
         scaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener());
-
-        Snackbar.make(mGraphicOverlay, "Tap to capture. Pinch/Stretch to zoom",
-                Snackbar.LENGTH_LONG)
-                .show();
     }
 
     /**
@@ -431,5 +427,21 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
     @Override
     public void onBarcodeDetected(Barcode barcode) {
         //do something with barcode data returned
+
+        if (Delimiter.DELIMITFUNCTIONALITY) {
+            /**
+             * I give back the result here. The library is capable of more than just giving it back,
+             * but I think that should be enough for our use case.
+             *
+             * When you remove these lines every found barcode will be shown with rectangles around.
+             */
+            Logger.Log(BarcodeCaptureActivity.class.getSimpleName(), "Barcode detected: " + barcode.displayValue);
+            Intent data = new Intent();
+            data.putExtra(BarcodeObject, barcode);
+            setResult(CommonStatusCodes.SUCCESS, data);
+            finish();
+        }
+
+
     }
 }
