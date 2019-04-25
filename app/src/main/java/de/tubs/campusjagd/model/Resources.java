@@ -21,11 +21,11 @@ public class Resources {
 
     private Resources(Context context) {
 
-        Room room1 = new Room(null, new GPS(), "Raum 161", 2, System.currentTimeMillis(), true);
-        Room room2 = new Room(null, new GPS(), "Raum 31", 1, System.currentTimeMillis(), false);
-        Room room3 = new Room(null, new GPS(), "Raum 74", 10, System.currentTimeMillis(), true);
+        Room room1 = new Room(null, new GPS(52.272899, 10.525311), "Raum 161", 2, System.currentTimeMillis(), true);
+        Room room3 = new Room(null, new GPS(), "Raum 74", 10, System.currentTimeMillis(), false);
+        Room room2 = new Room(null, new GPS(52.274760, 10.526023), "Mensa", 1, System.currentTimeMillis(), true);
         Room room4 = new Room(null, new GPS(), "Raum 111", 2, System.currentTimeMillis(), false);
-        Room room5 = new Room(null, new GPS(), "Raum 142", 4, System.currentTimeMillis(),true);
+        Room room5 = new Room(null, new GPS(52.272678, 10.526844), "Pk 2.2", 4, System.currentTimeMillis(),true);
         Room room6 = new Room(null, new GPS(), "Raum 262", 6, System.currentTimeMillis(), false);
 
         allRooms = new ArrayList<>();

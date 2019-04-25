@@ -18,6 +18,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import de.tubs.campusjagd.R;
+import de.tubs.campusjagd.gps.MapsPointCreator;
 
 /**
  * Stats fragment showing all found rooms
@@ -68,8 +69,12 @@ public class StatsFragment extends Fragment implements OnMapReadyCallback {
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        //LatLng sydney = new LatLng(-34, 151);
+        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
+        MapsPointCreator helper = new MapsPointCreator(StatsFragment.this.getContext(), mMap);
+        helper.createPointsOnMap();
+        helper.setCameraPosition();
     }
 }

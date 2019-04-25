@@ -5,6 +5,7 @@ import android.content.Context;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -22,8 +23,7 @@ public class MapsPointCreator {
 
 
     // The zoom preferences are just integer on the google maps api.
-    private static final float ZOOMPREFERENCE = 6F;
-    private static final float MAXIMUMDISTANCETOUSER_INMETERS = 300 * 1000;
+    private static final float ZOOMPREFERENCE = 14F;
 
     // The context
     private Context mContext;
@@ -55,10 +55,11 @@ public class MapsPointCreator {
     private MarkerOptions createOnePoint(Room room) {
         MarkerOptions options = new MarkerOptions();
 
-        LatLng position = new LatLng(room.getGps().latitude, room.getGps().latitude);
+        LatLng position = new LatLng(room.getGps().latitude, room.getGps().longitude);
         options.position(position);
 
         options.title(room.getName());
+        options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
 
         return options;
     }
@@ -84,7 +85,10 @@ public class MapsPointCreator {
      */
     private LatLngBounds.Builder getCameraPositionBuilder(LatLngBounds.Builder builder) {
         for (Room room: mRooms) {
-            builder.include(new LatLng(room.getGps().latitude, room.getGps().longitude));
+            if (room.isRoomFound()) {
+                builder.include(new LatLng(room.getGps().latitude, room.getGps().longitude));
+
+            }
         }
         return builder;
     }
