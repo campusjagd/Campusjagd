@@ -19,10 +19,17 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import de.tubs.campusjagd.R;
 
+/**
+ * Stats fragment showing all found rooms
+ *
+ * @author l.brettin@tu-bs.de
+ */
 public class StatsFragment extends Fragment implements OnMapReadyCallback {
 
+    // View representation of the map
     private MapView mMapView;
 
+    // Object representation of the map
     private GoogleMap mMap;
 
     @Nullable
@@ -35,6 +42,11 @@ public class StatsFragment extends Fragment implements OnMapReadyCallback {
         return view;
     }
 
+    /**
+     * Inits the google maps api in the fragment
+     * @param view Inflated View
+     * @param savedInstanceState Saved states for the view creation
+     */
     private void init(View view, Bundle savedInstanceState) {
         mMapView = view.findViewById(R.id.stats_map);
         mMapView.onCreate(savedInstanceState);
