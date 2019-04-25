@@ -77,11 +77,11 @@ public class RoomListFragment extends Fragment {
                     FragmentTransaction transaction = RoomListFragment.this.getActivity()
                             .getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.contentHolder, mCreateNewRoomFragment)
-                            .addToBackStack(ChallengeCreateListFragment.class.getSimpleName())
+                            .addToBackStack(CreateNewRoomFragment.class.getSimpleName())
                             .commit();
 
                 } catch (NullPointerException e) {
-                    Logger.LogExeption(ChallengeCreateListFragment.class.getSimpleName(), "Error while starting new Fragment", e);
+                    Logger.LogExeption(CreateNewRoomFragment.class.getSimpleName(), "Error while starting new Fragment", e);
                 }
             }
         });

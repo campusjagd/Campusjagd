@@ -18,6 +18,10 @@
     <string name="stats_header">Gefundene Räume</string>
     <string name="create_new_room_header">Raum erstellen</string>
     <string name="create_new_challenge_header">Challenge erstellen</string>
+    <string name="waiting_for_ptp_header">Challenge erstellen</string>
+
+
+    <string name="waiting_for_peer_to_peer">Auf Peer to Peer Verbindung warten</string>
 
 
     <string name="create_challenge_name">Challenge Name</string>

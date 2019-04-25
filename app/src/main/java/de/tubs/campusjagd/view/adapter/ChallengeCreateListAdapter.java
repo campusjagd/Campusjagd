@@ -1,8 +1,12 @@
 package de.tubs.campusjagd.view.adapter;
 
+import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,6 +18,9 @@ import java.util.List;
 
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.model.Challenge;
+import de.tubs.campusjagd.view.ChallengeCreateListFragment;
+import de.tubs.campusjagd.view.PeerToPeerFragment;
+import de.tubs.campusjagd.view.RoomListFragment;
 
 /**
  * Adapter holding all challenges which should be created.
@@ -40,13 +47,19 @@ public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCr
     private int mExpandedPosition = -1;
 
     /**
+     * The holding activity
+     */
+    private Fragment mFragment;
+
+    /**
      * Basic constructor
      * @param challenges List of challenges to be shown
-     * @param context The {@link Context}
+     * @param fragment The {@link Activity}
      */
-    public ChallengeCreateListAdapter (List<Challenge> challenges, Context context) {
+    public ChallengeCreateListAdapter (List<Challenge> challenges, Fragment fragment) {
         mChallenges = challenges;
-        mContext = context;
+        mContext = fragment.getContext();
+        mFragment = fragment;
     }
 
     /**
@@ -68,7 +81,7 @@ public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCr
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ChallengeCreateViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ChallengeCreateViewHolder holder, final int position) {
         Challenge challenge = mChallenges.get(position);
 
         holder.challengeName.setText(challenge.getName());
@@ -94,6 +107,26 @@ public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCr
                 //TransitionManager.beginDelayedTransition(mRecyclerView);
 
                 notifyItemChanged(itemposition);
+            }
+        });
+
+        // Prepare fab to start peer to peer connection
+        holder.fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Create a new fragment
+                PeerToPeerFragment replaceFragment = new PeerToPeerFragment();
+
+                // Give the fragment the challenge as bundle
+                Bundle bundle = new Bundle();
+                bundle.putString(PeerToPeerFragment.BUNDLEKEY, mChallenges.get(position).toString());
+                replaceFragment.setArguments(bundle);
+
+                // Start new fragment
+                FragmentTransaction transaction = mFragment.getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.contentHolder, replaceFragment)
+                        .addToBackStack(PeerToPeerFragment.class.getSimpleName())
+                        .commit();
             }
         });
 

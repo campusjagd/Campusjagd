@@ -61,7 +61,7 @@ public class ChallengeCreateListFragment extends Fragment {
         challengeRecycleView.setLayoutManager(llm);
 
         // Set up adapter
-        mAdapter = new ChallengeCreateListAdapter(new ArrayList<Challenge>(), view.getContext());
+        mAdapter = new ChallengeCreateListAdapter(new ArrayList<Challenge>(), ChallengeCreateListFragment.this);
         // Bind adapter
         challengeRecycleView.setAdapter(mAdapter);
 
