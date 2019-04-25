@@ -20,17 +20,32 @@ public class PermissionManager {
     public static boolean checkPermissions(Activity activity) {
         boolean fineLocationPermissionGranted = checkAccessFineLocation(activity);
         boolean coarseLoctationPermissionGranted = checkAccessCoarseLocation(activity);
+        boolean cameraPermissionGranted = checkCameraAccess(activity);
 
         if (!fineLocationPermissionGranted) {
             ActivityCompat.requestPermissions(activity, new String [] {Manifest.permission.ACCESS_FINE_LOCATION}, 14141);
 
         } else if (!coarseLoctationPermissionGranted) {
-            ActivityCompat.requestPermissions(activity, new String [] {Manifest.permission.ACCESS_COARSE_LOCATION}, 14141);
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 14141);
+
+        } else if (!cameraPermissionGranted) {
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.CAMERA}, 14141);
+
         } else {
             return true;
+
         }
 
         return false;
+    }
+
+    /**
+     * Checks if the permission for the camera is given
+     * @param activity The {@link Activity}
+     * @return True if the permission is given
+     */
+    public static boolean checkCameraAccess(Activity activity) {
+        return ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
 
     /**
