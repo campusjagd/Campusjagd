@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 
 import de.tubs.campusjagd.R;
+import de.tubs.campusjagd.etc.Logger;
 import de.tubs.campusjagd.gps.MapsHelper;
 
 /**
@@ -70,5 +72,18 @@ public class StatsFragment extends Fragment implements OnMapReadyCallback {
         MapsHelper helper = new MapsHelper(StatsFragment.this.getContext(), mMap);
         helper.createPointsOnMap();
         helper.setCameraPosition();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        try {
+            // Set toolbar
+            Toolbar actionBarToolbar = this.getActivity().findViewById(R.id.toolbar);
+            actionBarToolbar.setTitle(R.string.stats_header);
+
+        } catch (NullPointerException e) {
+            Logger.LogExeption(CreateNewRoomFragment.class.getSimpleName(), "Unable to set toolbar", e);
+        }
     }
 }

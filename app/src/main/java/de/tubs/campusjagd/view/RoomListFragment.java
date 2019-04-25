@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,10 +50,9 @@ public class RoomListFragment extends Fragment {
      * @param view View holding the fragment
      */
     private void init(View view) {
-        //TODO replace this later
+        // Get rooms
         Resources resources = Resources.getInstance(view.getContext());
         mRoomList = resources.getAllRooms();
-        //-----
 
         // Setup room list
         RecyclerView roomRecyclerView = view.findViewById(R.id.roomfragment_recyclerview);
@@ -87,5 +87,19 @@ public class RoomListFragment extends Fragment {
         });
 
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        try {
+            // Set toolbar
+            Toolbar actionBarToolbar = this.getActivity().findViewById(R.id.toolbar);
+            actionBarToolbar.setTitle(R.string.menu_roomlist);
+
+        } catch (NullPointerException e) {
+            Logger.LogExeption(CreateNewRoomFragment.class.getSimpleName(), "Unable to set toolbar", e);
+        }
     }
 }

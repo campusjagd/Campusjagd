@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,6 +90,19 @@ public class ChallengeCreateListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        try {
+            // Set toolbar
+            Toolbar actionBarToolbar = this.getActivity().findViewById(R.id.toolbar);
+            actionBarToolbar.setTitle(R.string.menu_challenge_list);
+
+        } catch (NullPointerException e) {
+            Logger.LogExeption(CreateNewRoomFragment.class.getSimpleName(), "Unable to set toolbar", e);
+        }
+        /**
+         * The fragment can be resumed in 2 ways:
+         *      First is when it started the first time
+         *      Second is when we added a new challenge
+         */
         List<Challenge> challengeList = mResources.getAllChallenges();
         mAdapter.exchangeAllChallenges(challengeList);
     }
