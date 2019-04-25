@@ -8,17 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import de.tubs.campusjagd.R;
-import de.tubs.campusjagd.gps.MapsPointCreator;
+import de.tubs.campusjagd.gps.MapsHelper;
 
 /**
  * Stats fragment showing all found rooms
@@ -49,31 +45,29 @@ public class StatsFragment extends Fragment implements OnMapReadyCallback {
      * @param savedInstanceState Saved states for the view creation
      */
     private void init(View view, Bundle savedInstanceState) {
+        // Init map
         mMapView = view.findViewById(R.id.stats_map);
         mMapView.onCreate(savedInstanceState);
-
         mMapView.onResume(); // needed to get the map to display immediately
-
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         mMapView.getMapAsync(this);
 
     }
 
+    /**
+     * The map needs some time to be ready. When its ready we will initiate the points
+     * @param googleMap Object representation of the map
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        //LatLng sydney = new LatLng(-34, 151);
-        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-
-        MapsPointCreator helper = new MapsPointCreator(StatsFragment.this.getContext(), mMap);
+        // Setup all maps elements
+        MapsHelper helper = new MapsHelper(StatsFragment.this.getContext(), mMap);
         helper.createPointsOnMap();
         helper.setCameraPosition();
     }

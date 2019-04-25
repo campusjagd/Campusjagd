@@ -17,17 +17,19 @@ import de.tubs.campusjagd.model.Room;
 
 /**
  * Class to work with the points to create on the map
+ *
+ * @author l.brettin@tu-bs.de
  */
-public class MapsPointCreator {
-
-
+public class MapsHelper {
 
     // The zoom preferences are just integer on the google maps api.
     private static final float ZOOMPREFERENCE = 14F;
 
     // The context
     private Context mContext;
+    // The google map to work with
     private GoogleMap mGoogleMap;
+    // List of all rooms
     private List<Room> mRooms;
 
     /**
@@ -35,7 +37,7 @@ public class MapsPointCreator {
      * @param context The {@link Context}
      * @param googleMap Map to draw points on
      */
-    public MapsPointCreator(Context context, GoogleMap googleMap) {
+    public MapsHelper(Context context, GoogleMap googleMap) {
         mContext = context;
         mGoogleMap = googleMap;
         mRooms = Resources.getInstance(mContext).getAllRooms();
@@ -52,13 +54,22 @@ public class MapsPointCreator {
         }
     }
 
+    /**
+     * Creates one Point object to add on the map
+     * @param room Room which represents the point
+     * @return MarkerOptions to put on the map
+     */
     private MarkerOptions createOnePoint(Room room) {
         MarkerOptions options = new MarkerOptions();
 
+        // Set position
         LatLng position = new LatLng(room.getGps().latitude, room.getGps().longitude);
         options.position(position);
 
+        // Set Title
         options.title(room.getName());
+
+        // Change color of the icon
         options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
 
         return options;
@@ -69,7 +80,7 @@ public class MapsPointCreator {
      */
     public void setCameraPosition() {
         LatLngBounds.Builder builder = LatLngBounds.builder();
-        this.getCameraPositionBuilder(builder);
+        builder = this.getCameraPositionBuilder(builder);
 
         // Set Camera
         LatLngBounds bounds = builder.build();
