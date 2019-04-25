@@ -1,5 +1,6 @@
 package de.tubs.campusjagd.view.adapter;
 
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,10 +10,17 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
+
 import java.util.Date;
 import java.util.List;
 
 import de.tubs.campusjagd.R;
+import de.tubs.campusjagd.etc.Logger;
 import de.tubs.campusjagd.model.Room;
 
 /**
@@ -67,7 +75,7 @@ public class ExtendedRoomAdapter extends RecyclerView.Adapter<ItemExtendedRoomVi
         holder.points.setText(Integer.toString(room.getPoints()));
         holder.gpsPosition.setText("GPS: " + room.getGps().toString());
         holder.checkBox.setChecked(room.isRoomFound());
-        // TODO generate qr code
+        generateQR(holder.qr, room.toString());
 
         // Expansion of challenge when you click on it
         final boolean isExpanded = position == mExpandedPosition;
@@ -90,6 +98,19 @@ public class ExtendedRoomAdapter extends RecyclerView.Adapter<ItemExtendedRoomVi
     @Override
     public int getItemCount() {
         return mRoomList.size();
+    }
+
+    private void generateQR(ImageView imageView, String text) {
+        MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
+        try {
+            BitMatrix bitMatrix = multiFormatWriter.encode(text, BarcodeFormat.QR_CODE,400,400);
+            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+            Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
+            imageView.setImageBitmap(bitmap);
+        } catch (WriterException e) {
+            Logger.LogExeption(ExtendedRoomAdapter.class.getSimpleName(), "Unable to write QR", e);
+
+        }
     }
 }
 
