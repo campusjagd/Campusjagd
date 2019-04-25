@@ -78,4 +78,6 @@ public class Resources {
     public void saveRoom(Room room) {
         allRooms.add(room);
     }
+
+    public void handleBarcodeRead(String barcodeValue) { }
 }
