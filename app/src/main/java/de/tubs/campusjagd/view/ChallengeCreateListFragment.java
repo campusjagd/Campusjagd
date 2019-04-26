@@ -52,7 +52,6 @@ public class ChallengeCreateListFragment extends Fragment {
         RecyclerView challengeRecycleView = view.findViewById(R.id.challenge_create_recyclerview);
 
         // Set up resources
-        //TODO Change this mock
         mResources = Resources.getInstance(view.getContext());
 
         // Set up recyclerview for challenges

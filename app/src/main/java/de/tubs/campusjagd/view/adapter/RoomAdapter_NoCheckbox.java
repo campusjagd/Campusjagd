@@ -33,4 +33,5 @@ public class RoomAdapter_NoCheckbox extends RoomAdapter {
         holder.roomCheckBox.setVisibility(View.GONE);
 
     }
+
 }

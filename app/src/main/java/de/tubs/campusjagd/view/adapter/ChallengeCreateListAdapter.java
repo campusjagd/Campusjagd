@@ -72,6 +72,8 @@ public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCr
         this.notifyDataSetChanged();
     }
 
+
+
     @NonNull
     @Override
     public ChallengeCreateViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
@@ -81,7 +83,7 @@ public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCr
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ChallengeCreateViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull ChallengeCreateViewHolder holder, int position) {
         Challenge challenge = mChallenges.get(position);
 
         holder.challengeName.setText(challenge.getName());
@@ -90,6 +92,7 @@ public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCr
         // Set up recyclerview for rooms
         LinearLayoutManager llm = new LinearLayoutManager(mContext);
         holder.recyclerView.setLayoutManager(llm);
+        holder.recyclerView.setHasFixedSize(false);
         // Bind adapter
         holder.recyclerView.setAdapter(new RoomAdapter_NoCheckbox(challenge.getRoomList()));
 
@@ -110,6 +113,8 @@ public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCr
             }
         });
 
+        final String challengeStringRepresentation = mChallenges.get(position).toString();
+
         // Prepare fab to start peer to peer connection
         holder.fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,7 +124,7 @@ public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCr
 
                 // Give the fragment the challenge as bundle
                 Bundle bundle = new Bundle();
-                bundle.putString(PeerToPeerFragment.BUNDLEKEY, mChallenges.get(position).toString());
+                bundle.putString(PeerToPeerFragment.BUNDLEKEY, challengeStringRepresentation);
                 replaceFragment.setArguments(bundle);
 
                 // Start new fragment
