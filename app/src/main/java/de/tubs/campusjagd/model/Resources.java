@@ -1,13 +1,17 @@
 package de.tubs.campusjagd.model;
 
 import android.content.Context;
+import android.database.Cursor;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import de.tubs.campusjagd.Database.DatabaseHelperRoom;
+
 public class Resources {
 
     private static Resources mInstance;
+    private static DatabaseHelperRoom mDatabaseHelperRoom;
 
     public static Resources getInstance(Context context) {
         if (mInstance == null) {
@@ -17,9 +21,10 @@ public class Resources {
     }
 
     private List<Challenge> allChallenges;
-    private List<Room> allRooms;
 
     private Resources(Context context) {
+
+        mDatabaseHelperRoom = new DatabaseHelperRoom(context);
 
         Room room1 = new Room(null, new GPS(52.272899, 10.525311), "Raum 161", 2, System.currentTimeMillis(), true);
         Room room3 = new Room(null, new GPS(), "Raum 74", 10, System.currentTimeMillis(), false);
@@ -28,13 +33,12 @@ public class Resources {
         Room room5 = new Room(null, new GPS(52.272678, 10.526844), "Pk 2.2", 4, System.currentTimeMillis(),true);
         Room room6 = new Room(null, new GPS(), "Raum 262", 6, System.currentTimeMillis(), false);
 
-        allRooms = new ArrayList<>();
-        allRooms.add(room1);
-        allRooms.add(room2);
-        allRooms.add(room3);
-        allRooms.add(room4);
-        allRooms.add(room5);
-        allRooms.add(room6);
+        mDatabaseHelperRoom.addRoom(room1);
+        mDatabaseHelperRoom.addRoom(room2);
+        mDatabaseHelperRoom.addRoom(room3);
+        mDatabaseHelperRoom.addRoom(room4);
+        mDatabaseHelperRoom.addRoom(room5);
+        mDatabaseHelperRoom.addRoom(room6);
 
         ArrayList<Room> roomlist1 = new ArrayList<>();
         roomlist1.add(room1);
@@ -68,7 +72,29 @@ public class Resources {
     }
 
     public List<Room> getAllRooms() {
-        return allRooms;
+        List<Room> list = new ArrayList<>();
+
+        Cursor data = mDatabaseHelperRoom.getAllRooms();
+
+        while(data.moveToNext()){
+            //get the value from the database in column 0 to 4 (equal to column-naming-scheme at the
+            //top of the databasehelperroom class. Meaning COL0 == COL_NAME, COL1 == COL_ and so on)
+            //then add it to the arraylist
+            String name = data.getString(0);
+            GPS gps = GPS.stringToGPS(data.getString(1));
+            int points = data.getInt(2);
+            long timestamp = Long.valueOf(data.getString(3));
+            boolean roomFound;
+            if (data.getString(4).equals("true")){
+                roomFound = true;
+            }else{
+                roomFound = false;
+            }
+
+            Room room = new Room(null, gps, name, points, timestamp, roomFound);
+            list.add(room);
+        }
+        return list;
     }
 
     public void saveChallenge(Challenge challenge){
@@ -76,7 +102,7 @@ public class Resources {
     }
 
     public void saveRoom(Room room) {
-        allRooms.add(room);
+        mDatabaseHelperRoom.addRoom(room);
     }
 
     public void handleBarcodeRead(String barcodeValue) { }
