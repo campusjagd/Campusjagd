@@ -13,6 +13,7 @@
     <string name="menu_challenge_list">Alle Challenges</string>
     <string name="menu_roomlist">Alle Räume</string>
     <string name="menu_stats">Status</string>
+    <string name="menu_challenge_transfer">Challenge erhalten</string>
 
     <!-- Menu toolbar header-->
     <string name="stats_header">Gefundene Räume</string>

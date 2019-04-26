@@ -15,9 +15,9 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import de.tubs.campusjagd.etc.PermissionManager;
-import de.tubs.campusjagd.gps.CJLocationManager;
 import de.tubs.campusjagd.view.ChallengeCreateListFragment;
 import de.tubs.campusjagd.view.ChallengeListFragment;
+import de.tubs.campusjagd.view.ChallengeTransferFragment;
 import de.tubs.campusjagd.view.RoomListFragment;
 import de.tubs.campusjagd.view.StatsFragment;
 
@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity
     ChallengeCreateListFragment mChallengeCreateListFragment;
     RoomListFragment mRoomListFragment;
     StatsFragment mStatsFragment;
+    ChallengeTransferFragment mChallengeTransfer;
 
     /**
      * Starts this activity
@@ -71,6 +72,7 @@ public class MainActivity extends AppCompatActivity
         mChallengeCreateListFragment = new ChallengeCreateListFragment();
         mRoomListFragment = new RoomListFragment();
         mStatsFragment = new StatsFragment();
+        mChallengeTransfer = new ChallengeTransferFragment();
 
 
         // Add first fragment to the content holder
@@ -155,6 +157,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_stats) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.contentHolder, mStatsFragment).commit();
+        } else if (id == R.id.nav_challenge_transfer) {
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.contentHolder, mChallengeTransfer).commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
