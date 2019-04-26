@@ -1,4 +1,4 @@
-package de.tubs.campusjagd.view;
+package de.tubs.campusjagd.view.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;

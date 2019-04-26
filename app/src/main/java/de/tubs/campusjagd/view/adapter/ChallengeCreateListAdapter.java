@@ -18,9 +18,7 @@ import java.util.List;
 
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.model.Challenge;
-import de.tubs.campusjagd.view.ChallengeCreateListFragment;
-import de.tubs.campusjagd.view.PeerToPeerFragment;
-import de.tubs.campusjagd.view.RoomListFragment;
+import de.tubs.campusjagd.view.fragments.PeerToPeerFragment;
 
 /**
  * Adapter holding all challenges which should be created.

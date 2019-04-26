@@ -15,11 +15,11 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import de.tubs.campusjagd.etc.PermissionManager;
-import de.tubs.campusjagd.view.ChallengeCreateListFragment;
-import de.tubs.campusjagd.view.ChallengeListFragment;
-import de.tubs.campusjagd.view.ChallengeTransferFragment;
-import de.tubs.campusjagd.view.RoomListFragment;
-import de.tubs.campusjagd.view.StatsFragment;
+import de.tubs.campusjagd.view.fragments.ChallengeCreateListFragment;
+import de.tubs.campusjagd.view.fragments.ChallengeListFragment;
+import de.tubs.campusjagd.view.fragments.ChallengeTransferFragment;
+import de.tubs.campusjagd.view.fragments.RoomListFragment;
+import de.tubs.campusjagd.view.fragments.StatsFragment;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {

@@ -1,4 +1,4 @@
-package de.tubs.campusjagd.view;
+package de.tubs.campusjagd.view.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,7 +17,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
-import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.util.List;
 
