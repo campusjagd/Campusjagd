@@ -17,13 +17,36 @@ class Room(db.Model):
     points = db.Column(db.Integer)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     challenges = relationship("Challenges", secondary=room_challenge, back_populates="rooms")
+    def to_dict(self):
+        data = {
+            "id": self.id,
+            "name": self.name,
+            "gpsposition": self.gpsposition,
+            "points": self.points,
+            "timestamp": self.timestamp
+            }
+        return data
 
 class Challenge(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     rooms = relationship("Rooms", secondary=room_challenge, back_populates="challenges")
+    def to_dict(self):
+        data = {
+            "id": self.id,
+            "name": self.name,
+            "rooms": [room.to_dict() for room in self.rooms],
+        }
+        return data
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     points = db.Column(db.Integer)
+    def ti_dict(self):
+        data = {
+            "id": self.id,
+            "name": self.name,
+            "points": self.points
+        }
+        return data
