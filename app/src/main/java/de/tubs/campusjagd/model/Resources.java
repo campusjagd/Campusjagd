@@ -6,12 +6,14 @@ import android.database.Cursor;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.tubs.campusjagd.Database.DatabaseHelperChallenge;
 import de.tubs.campusjagd.Database.DatabaseHelperRoom;
 
 public class Resources {
 
     private static Resources mInstance;
     private static DatabaseHelperRoom mDatabaseHelperRoom;
+    private static DatabaseHelperChallenge mDatabaseHelperChallenge;
 
     public static Resources getInstance(Context context) {
         if (mInstance == null) {
@@ -20,11 +22,10 @@ public class Resources {
         return mInstance;
     }
 
-    private List<Challenge> allChallenges;
-
     private Resources(Context context) {
 
         mDatabaseHelperRoom = new DatabaseHelperRoom(context);
+        mDatabaseHelperChallenge = new DatabaseHelperChallenge(context);
 
         Room room1 = new Room(null, new GPS(52.272899, 10.525311), "Raum 161", 2, System.currentTimeMillis(), true);
         Room room3 = new Room(null, new GPS(), "Raum 74", 10, System.currentTimeMillis(), false);
@@ -61,20 +62,46 @@ public class Resources {
         Challenge challenge2 = new Challenge("MockChallenge 2", roomlist2);
         Challenge challenge3 = new Challenge("MockChallenge 3", roomlist3);
 
-        allChallenges = new ArrayList<>();
-        allChallenges.add(challenge1);
-        allChallenges.add(challenge2);
-        allChallenges.add(challenge3);
+        mDatabaseHelperChallenge.addChallenge(challenge1);
+        mDatabaseHelperChallenge.addChallenge(challenge2);
+        mDatabaseHelperChallenge.addChallenge(challenge3);
+
     }
 
     public List<Challenge> getAllChallenges() {
-        return allChallenges;
+        List<Challenge> challengeList = new ArrayList<>();
+
+        Cursor data = mDatabaseHelperChallenge.getAllChallenges();
+
+        while(data.moveToNext()){
+            //get the value from the database in column 0 to 4 (equal to column-naming-scheme at the
+            //top of the databasehelperroom class. Meaning COL0 == COL_NAME, COL1 == COL_ and so on)
+            //then add it to the arraylist
+            String name = data.getString(0);
+            String roomsAsString = data.getString(1);
+           String[] roomValues = roomsAsString.split(";");
+           List<Room> roomList = new ArrayList<>();
+           for (String roomName : roomValues){
+               Cursor roomData = mDatabaseHelperRoom.getSpecificRoom(roomName);
+               //calling the method with a cursor containing only 1 entry
+               roomList.addAll(instantiateRoomList(roomData));
+           }
+
+            Challenge challenge = new Challenge(name, roomList);
+            challengeList.add(challenge);
+        }
+        return challengeList;
     }
 
     public List<Room> getAllRooms() {
-        List<Room> list = new ArrayList<>();
-
         Cursor data = mDatabaseHelperRoom.getAllRooms();
+
+        //Calling the function with a cursor, that contains multiple entries
+        return instantiateRoomList(data);
+    }
+
+    private List<Room> instantiateRoomList(Cursor data){
+        List<Room> roomList = new ArrayList<>();
 
         while(data.moveToNext()){
             //get the value from the database in column 0 to 4 (equal to column-naming-scheme at the
@@ -92,13 +119,13 @@ public class Resources {
             }
 
             Room room = new Room(null, gps, name, points, timestamp, roomFound);
-            list.add(room);
+            roomList.add(room);
         }
-        return list;
+        return roomList;
     }
 
     public void saveChallenge(Challenge challenge){
-        allChallenges.add(challenge);
+        mDatabaseHelperChallenge.addChallenge(challenge);
     }
 
     public void saveRoom(Room room) {

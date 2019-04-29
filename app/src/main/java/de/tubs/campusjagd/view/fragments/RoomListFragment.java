@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
-import de.tubs.campusjagd.Database.DatabaseHelperRoom;
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.etc.Logger;
 import de.tubs.campusjagd.model.Resources;
@@ -34,7 +33,6 @@ public class RoomListFragment extends Fragment {
 
     //Fragment to start when a new room should be created
     private Fragment mCreateNewRoomFragment;
-    private DatabaseHelperRoom mDatabaseHelperRoom;
 
     @Nullable
     @Override

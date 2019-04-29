@@ -7,32 +7,28 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import de.tubs.campusjagd.model.Challenge;
 import de.tubs.campusjagd.model.Room;
 
-public class DatabaseHelperRoom extends SQLiteOpenHelper {
+public class DatabaseHelperChallenge extends SQLiteOpenHelper {
 
     private static final String TAG = "DatabaseHelperRoom";
 
-    private static final String TABLE_NAME = "room_table";
+    private static final String TABLE_NAME = "challenge_table";
     private static final String COL_NAME = "name";
-    private static final String COL_GPS = "gps";
-    private static final String COL_POINTS = "points";
-    private static final String COL_TIMESTAMP = "timestamp";
-    private static final String COL_ROOMFOUND = "roomFound";
+    private static final String COL_ROOMS = "rooms";
 
-    public DatabaseHelperRoom(Context context){
+    public DatabaseHelperChallenge(Context context){
         super(context, TABLE_NAME, null, 1);
     }
 
-    /**
-     * Creating the table, to hold the data, by calling a query called createTable
-     * @param db
-     */
     @Override
     public void onCreate(SQLiteDatabase db) {
         String createTable = "CREATE TABLE " + TABLE_NAME + " ( " +
-                COL_NAME + " TEXT PRIMARY KEY," + COL_GPS + " TEXT, " + COL_POINTS + " INTEGER, " +
-                COL_TIMESTAMP + " TEXT, " + COL_ROOMFOUND + " TEXT) ";
+                COL_NAME + " TEXT PRIMARY KEY," + COL_ROOMS + " TEXT )" ;
         db.execSQL(createTable);
     }
 
@@ -52,29 +48,26 @@ public class DatabaseHelperRoom extends SQLiteOpenHelper {
     /**
      * Function to add data to the table, it returns a bool to indicate a
      * successful insertion of the data, or the fail of that operation
-     * @param room
+     * @param challenge
      * @return
      */
-    public boolean addRoom(Room room){
+    public boolean addChallenge(Challenge challenge){
         //Create and/or open a database that will be used for reading and writing
         SQLiteDatabase db = this.getWritableDatabase();
         //ContentValues is used to store a set of values that the ContentResolver can process
         ContentValues contentValues = new ContentValues();
 
         //it contains the name of the column and the value the column for  this item is supposed to have
-        contentValues.put(COL_NAME, room.getName());
-        String s = room.getGps().toString();
-        contentValues.put(COL_GPS, room.getGps().toString());
-        contentValues.put(COL_POINTS, room.getPoints());
-        contentValues.put(COL_TIMESTAMP, Long.toString(room.getTimestamp()));
-        if (room.isRoomFound()){
-            contentValues.put(COL_ROOMFOUND, "true");
-        }else{
-            contentValues.put(COL_ROOMFOUND, "false");
+        contentValues.put(COL_NAME, challenge.getName());
+        List<Room> rooms = new ArrayList<>();
+        rooms = challenge.getRoomList();
+        String roomListAsString = "";
+        for (Room room : rooms){
+            roomListAsString += room.getName() + ";";
         }
+        contentValues.put(COL_ROOMS, roomListAsString);
 
-        Log.d(TAG, "addData: Adding " + room.getName() +  " " + room.getGps().toString() +
-                " "+ room.getPoints() +  " " + room.getTimestamp() +  " " + room.isRoomFound() +
+        Log.d(TAG, "addData: Adding " + challenge.getName() +  ", " + roomListAsString +
                 " to " + TABLE_NAME);
 
         //insert the content of the contentValue into the table, the null is optional and used for:
@@ -95,24 +88,12 @@ public class DatabaseHelperRoom extends SQLiteOpenHelper {
     /**
      * get the id of a certain item, if there are multiple items with the same name, the
      * first id is returned
-     * @param room
+     * @param challenge
      * @return
      */
-    public Cursor getSpecificRoom(Room room){
+    public Cursor getSpecificChallenge(Challenge challenge){
         SQLiteDatabase db = this.getWritableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COL_NAME + " = '" + room.getName() + "'";
-        Cursor data = db.rawQuery(query, null);
-        return data;
-    }
-
-    /**
-     * Method for finding rooms when one does not have complete Object, but only the name of the room
-     * @param roomName
-     * @return
-     */
-    public Cursor getSpecificRoom(String roomName){
-        SQLiteDatabase db = this.getWritableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COL_NAME + " = '" + roomName + "'";
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COL_NAME + " = '" + challenge.getName() + "'";
         Cursor data = db.rawQuery(query, null);
         return data;
     }
@@ -121,7 +102,7 @@ public class DatabaseHelperRoom extends SQLiteOpenHelper {
      * All entries of the tbale are returned
      * @return
      */
-    public Cursor getAllRooms(){
+    public Cursor getAllChallenges(){
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME;
         Cursor data = db.rawQuery(query, null);
@@ -130,22 +111,17 @@ public class DatabaseHelperRoom extends SQLiteOpenHelper {
 
     /**
      * updates an entry of the database where the ids match
-     * @param room
+     * @param challenge
      */
-    public void updateRoomFound(Room room){
-        SQLiteDatabase db = this.getWritableDatabase();
-        String query = "UPDATE " + TABLE_NAME + " SET " + COL_ROOMFOUND + " = 'true' WHERE "
-                + COL_NAME + " = '" + room.getName() + "'";
-        Log.d(TAG, "updateName: query: " + query);
-        Log.d(TAG, "updateName: Setting to: " + true);
-        db.execSQL(query);
+    public void updateChallenge(Challenge challenge){
+        //TODO Add functionality, if it is needed at all
     }
 
     /**
      * delete an entry, where id and name match
      * @param name
      */
-    public void deleteRoom(String name){
+    public void deleteChallenge(String name){
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "DELETE FROM " + TABLE_NAME + " WHERE " + COL_NAME + " = '" + name + "'";
         Log.d(TAG, "deleteName: query: " + query);
