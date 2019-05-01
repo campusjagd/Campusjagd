@@ -111,7 +111,10 @@ public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCr
             }
         });
 
-        final String challengeStringRepresentation = mChallenges.get(position).toString();
+        //Need to use the getName function of the challenge object to transfer the challenge,
+        //otherwise all the p2pFragment gets is a memory address, with which no one can do
+        //anything
+        final String challengeStringRepresentation = mChallenges.get(position).getName();
 
         // Prepare fab to start peer to peer connection
         holder.fab.setOnClickListener(new View.OnClickListener() {

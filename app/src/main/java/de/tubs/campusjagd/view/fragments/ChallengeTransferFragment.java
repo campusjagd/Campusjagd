@@ -12,6 +12,13 @@ import de.tubs.campusjagd.R;
 
 public class ChallengeTransferFragment extends Fragment {
 
+    /* TODO Figure out, if this Fragment is necessary
+
+        May be obsolete, because the activity startet by the p2pFragment will, most likely, to be
+        capable of sending and receiving messages. The only requirement for the receiving end
+        is, that the phone has to be unlocked in order to receive messages
+     */
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

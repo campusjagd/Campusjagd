@@ -33,7 +33,17 @@ public class PeerToPeerFragment extends Fragment {
     }
 
     private void init(View view, String challengeString) {
-        // Do something ;-)
+        /*TODO start new nfc activitiy from here, where the chellenge is send and received on the other end.
+            The new activity gets the name of the challenge and all the rooms associated with it
+            (possibly all the information for every room will be included in the send message, or
+            the server will be used to get all the rooms information on the receiving end).
+            The receiver then just inserts the received challenge in his local database. Maybe even upload it
+            to the server.
+
+          TODO add permissions for nfc to the android manifest.
+
+          TODO add new activity
+        */
         Logger.Log(PeerToPeerFragment.class.getSimpleName(), "Challenge String: " + challengeString);
 
     }
