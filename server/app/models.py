@@ -1,5 +1,5 @@
 from app import db
-from sqlalchemy import Table, Column, Integer, ForeignKey, DateTime
+from sqlalchemy import Table, Column, Integer, ForeignKey, DateTime, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
@@ -30,11 +30,13 @@ class Room(db.Model):
 class Challenge(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
+    official = db.Column(db.Boolean, default=False)
     rooms = relationship("Rooms", secondary=room_challenge, back_populates="challenges")
     def to_dict(self):
         data = {
             "id": self.id,
             "name": self.name,
+            "official": self.official,
             "rooms": [room.to_dict() for room in self.rooms],
         }
         return data
@@ -43,7 +45,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     points = db.Column(db.Integer)
-    def ti_dict(self):
+    def to_dict(self):
         data = {
             "id": self.id,
             "name": self.name,
