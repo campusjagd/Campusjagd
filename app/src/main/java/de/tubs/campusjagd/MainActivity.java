@@ -15,6 +15,8 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import de.tubs.campusjagd.etc.PermissionManager;
+import de.tubs.campusjagd.nfc.ReceiverActivity;
+import de.tubs.campusjagd.nfc.SenderActivity;
 import de.tubs.campusjagd.view.fragments.ChallengeCreateListFragment;
 import de.tubs.campusjagd.view.fragments.ChallengeListFragment;
 import de.tubs.campusjagd.view.fragments.ChallengeTransferFragment;
@@ -158,8 +160,14 @@ public class MainActivity extends AppCompatActivity
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.contentHolder, mStatsFragment).commit();
         } else if (id == R.id.nav_challenge_transfer) {
+            /*
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.contentHolder, mChallengeTransfer).commit();
+            */
+
+            //Fragment not needed, the menu point will start the receiving activity
+            Intent intent = new Intent(this, ReceiverActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

@@ -86,20 +86,19 @@ public class DatabaseHelperChallenge extends SQLiteOpenHelper {
     }
 
     /**
-     * get the id of a certain item, if there are multiple items with the same name, the
-     * first id is returned
-     * @param challenge
+     * get a specific challenge for which only the name is known
+     * @param challengeName
      * @return
      */
-    public Cursor getSpecificChallenge(Challenge challenge){
+    public Cursor getSpecificChallenge(String challengeName){
         SQLiteDatabase db = this.getWritableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COL_NAME + " = '" + challenge.getName() + "'";
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COL_NAME + " = '" + challengeName + "'";
         Cursor data = db.rawQuery(query, null);
         return data;
     }
 
     /**
-     * All entries of the tbale are returned
+     * All entries of the table are returned
      * @return
      */
     public Cursor getAllChallenges(){

@@ -33,6 +33,7 @@ public class Resources {
         Room room4 = new Room(null, new GPS(), "Raum 111", 2, System.currentTimeMillis(), false);
         Room room5 = new Room(null, new GPS(52.272678, 10.526844), "Pk 2.2", 4, System.currentTimeMillis(),true);
         Room room6 = new Room(null, new GPS(), "Raum 262", 6, System.currentTimeMillis(), false);
+        //Room room7 = new Room(null, new GPS(), "Audimax", 6, System.currentTimeMillis(), true);
 
         mDatabaseHelperRoom.addRoom(room1);
         mDatabaseHelperRoom.addRoom(room2);
@@ -40,6 +41,7 @@ public class Resources {
         mDatabaseHelperRoom.addRoom(room4);
         mDatabaseHelperRoom.addRoom(room5);
         mDatabaseHelperRoom.addRoom(room6);
+        //mDatabaseHelperRoom.addRoom(room7);
 
         ArrayList<Room> roomlist1 = new ArrayList<>();
         roomlist1.add(room1);
@@ -74,8 +76,8 @@ public class Resources {
         Cursor data = mDatabaseHelperChallenge.getAllChallenges();
 
         while(data.moveToNext()){
-            //get the value from the database in column 0 to 4 (equal to column-naming-scheme at the
-            //top of the databasehelperroom class. Meaning COL0 == COL_NAME, COL1 == COL_ and so on)
+            //get the value from the database in column 0 to 1 (equal to column-naming-scheme at the
+            //top of the databasehelperroom class. Meaning COL0 == COL_NAME, COL1 == COL_ROOMS)
             //then add it to the arraylist
             String name = data.getString(0);
             String roomsAsString = data.getString(1);

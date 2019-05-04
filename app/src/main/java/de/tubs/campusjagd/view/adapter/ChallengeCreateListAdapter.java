@@ -2,6 +2,7 @@ package de.tubs.campusjagd.view.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -18,6 +19,7 @@ import java.util.List;
 
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.model.Challenge;
+import de.tubs.campusjagd.nfc.SenderActivity;
 import de.tubs.campusjagd.view.fragments.PeerToPeerFragment;
 
 /**
@@ -120,6 +122,7 @@ public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCr
         holder.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                /*
                 // Create a new fragment
                 PeerToPeerFragment replaceFragment = new PeerToPeerFragment();
 
@@ -133,6 +136,12 @@ public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCr
                 transaction.replace(R.id.contentHolder, replaceFragment)
                         .addToBackStack(PeerToPeerFragment.class.getSimpleName())
                         .commit();
+                        */
+
+                //starting the sender activity, to send a challenge via nfc to a peer
+                Intent intent = new Intent(mContext, SenderActivity.class);
+                intent.putExtra("ChallengeName", challengeStringRepresentation);
+                mContext.startActivity(intent);
             }
         });
 
