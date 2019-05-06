@@ -1,14 +1,15 @@
 from app.api import bp
-from flask import url_for
+from flask import url_for, jsonify
 from app import db
 from app.models import User
+from app import models
 from app.api.errors import bad_request
 
 @bp.route('/users', methods=['GET'])
 def get_users():
     data = {
-        "users": [user.to_dict() for user in User.query.all()],
-        "number_of_users": User.query.count()
+        "users": [user.to_dict() for user in db.session.query(User).all()],
+        "number_of_users": db.session.query(User).count()
     }
     return jsonify(data)
 
@@ -17,9 +18,9 @@ def update_user():
     data = request.get_json() or {}
     if 'name' not in data:
         return bad_request('must include username')
-    if User.query.filter_by(name=data['name']).first():
+    if db.session.query(User).filter_by(name=data['name']).first():
         # update user points
-        user = User.query.filter_by(name=data['name']).first()
+        user = db.session.query(User).filter_by(name=data['name']).first()
         user.points = data['points']
         db.session.add(user)
         db.session.commit()
@@ -40,7 +41,7 @@ def add_users():
     data = request.get_json() or {}
     if 'name' not in data:
         return bad_request('must include username')
-    if User.query.filter_by(name=data['name']).first():
+    if db.session.query(User).filter_by(name=data['name']).first():
         return bad_request('user aready existing')
     else:
         # add user with points
