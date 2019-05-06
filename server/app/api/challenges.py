@@ -12,7 +12,12 @@ def get_challenges():
     }
     return jsonify(data)
 
-@bp.route('/challenges', methods=['POST'])
+@bp.route('/challenge/<string:name>', methods=['GET'])
+def get_challenge_by_name(name):
+    search_name = name.upper()
+    return jsonify(db.session.query(Challenge).filter_by(name=search_name).first_or_404().to_dict())
+
+@bp.route('/challenge', methods=['POST'])
 def create_challenge():
     data = request.get_json() or {}
     if 'name' not in data:
@@ -23,7 +28,12 @@ def create_challenge():
         # add challenge
         challenge = Challenge()
         challenge.name = data['name']
-        # challenge.rooms
+        # rooms have to exist
+        room_list = data['rooms'].split(',')
+        for room in room_list:
+            room = room.trim().upper()
+            room_from_db = db.session.query(Room).filter_by(name = room).first()
+            challenge.rooms.append(room_from_db)
         db.session.add(challenge)
         db.session.commit()
     response = jsonify(challenge.to_dict())
