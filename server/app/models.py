@@ -43,7 +43,8 @@ class Challenge(Base):
         }
         return data
 
-class User(db.Model):
+class User(Base):
+    __tablename__='User'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     points = db.Column(db.Integer)
