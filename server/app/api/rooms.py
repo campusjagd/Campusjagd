@@ -25,7 +25,7 @@ def add_room():
     if db.session.query(Room).filter_by(name=data['name'].upper()).first():
         return bad_request('room aready existing')
     else:
-        # add user with points
+        # add room with points
         room = Room()
         room.name = data['name']
         room.gpsposition = data['gpsposition']
@@ -34,5 +34,5 @@ def add_room():
         db.session.commit()
     response = jsonify(room.to_dict())
     response.status_code = 201
-    response.headers['Location'] = url_for('api.add_room', id=user.id)
+    response.headers['Location'] = url_for('api.add_room', id=room.id)
     return response
