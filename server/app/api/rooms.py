@@ -15,7 +15,7 @@ def get_rooms():
 @bp.route('/room/<string:name>', methods=['GET'])
 def get_room_by_name(name):
     search_name = name.upper()
-    return jsonify(db.session.query(Room).get_or_404(name=search_name).to_dict())
+    return jsonify(db.session.query(Room).filter_by(name=search_name).first_or_404().to_dict())
 
 @bp.route('/room', methods=['POST'])
 def add_room():
