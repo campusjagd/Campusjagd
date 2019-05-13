@@ -35,8 +35,6 @@ public class CreateNewRoomFragment extends Fragment {
 
     // Edit text holding the name of the room
     private EditText mNameEditText;
-    // Edit text holding the number of points
-    private EditText mPointsEditText;
     // Text showing the
     private TextView mGPSText;
     // Actual found gps position
@@ -61,7 +59,6 @@ public class CreateNewRoomFragment extends Fragment {
         // Get Elements out of the view
         FloatingActionButton fab = view.findViewById(R.id.create_room_fab);
         mNameEditText = view.findViewById(R.id.create_room_name_edit_text);
-        mPointsEditText = view.findViewById(R.id.create_room_points_edit_text);
         Button gpsButton = view.findViewById(R.id.create_room_set_gps_button);
         mGPSText = view.findViewById(R.id.create_room_gps_string);
 
@@ -120,19 +117,8 @@ public class CreateNewRoomFragment extends Fragment {
         }
 
         // Get points
-        int points;
-        try {
-            points = Integer.parseInt(mPointsEditText.getText().toString());
-
-        } catch (NumberFormatException e) {
-
-            // If there is an error with the points, give the user a toast and clear the edit text
-            Logger.LogExeption(CreateNewRoomFragment.class.getSimpleName(), "Error while parsing points", e);
-            Toast.makeText(this.getContext(), R.string.create_room_parse_point_error, Toast.LENGTH_LONG).show();
-            mPointsEditText.getText().clear();
-
-            return false;
-        }
+        int points = 5;
+        // We removed the point functionality to 5 points per room
 
         if (mGPSPosition == null) {
             Toast.makeText(this.getContext(), R.string.create_room_no_gps_error, Toast.LENGTH_LONG).show();

@@ -21,6 +21,7 @@ import de.tubs.campusjagd.view.fragments.ChallengeCreateListFragment;
 import de.tubs.campusjagd.view.fragments.ChallengeListFragment;
 import de.tubs.campusjagd.view.fragments.ChallengeTransferFragment;
 import de.tubs.campusjagd.view.fragments.RoomListFragment;
+import de.tubs.campusjagd.view.fragments.SettingsFragment;
 import de.tubs.campusjagd.view.fragments.StatsFragment;
 
 public class MainActivity extends AppCompatActivity
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity
     RoomListFragment mRoomListFragment;
     StatsFragment mStatsFragment;
     ChallengeTransferFragment mChallengeTransfer;
+    SettingsFragment mSettingsFragment;
 
     /**
      * Starts this activity
@@ -75,6 +77,7 @@ public class MainActivity extends AppCompatActivity
         mRoomListFragment = new RoomListFragment();
         mStatsFragment = new StatsFragment();
         mChallengeTransfer = new ChallengeTransferFragment();
+        mSettingsFragment = new SettingsFragment();
 
 
         // Add first fragment to the content holder
@@ -153,9 +156,7 @@ public class MainActivity extends AppCompatActivity
 
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             //transaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_in_down, R.anim.slide_out_down, R.anim.slide_out_up);
-            transaction.replace(R.id.contentHolder, mRoomListFragment);
-            transaction.addToBackStack(null);
-            transaction.commit();
+            transaction.replace(R.id.contentHolder, mRoomListFragment).commit();
         } else if (id == R.id.nav_stats) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.contentHolder, mStatsFragment).commit();
@@ -168,6 +169,9 @@ public class MainActivity extends AppCompatActivity
             //Fragment not needed, the menu point will start the receiving activity
             Intent intent = new Intent(this, ReceiverActivity.class);
             startActivity(intent);
+        } else if (id == R.id.nav_settings) {
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.contentHolder, mSettingsFragment).commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

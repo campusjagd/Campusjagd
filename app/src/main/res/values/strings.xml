@@ -14,6 +14,7 @@
     <string name="menu_roomlist">Alle Räume</string>
     <string name="menu_stats">Status</string>
     <string name="menu_challenge_transfer">Challenge erhalten</string>
+    <string name="menu_settings">Einstellungen</string>
 
     <!-- Menu toolbar header-->
     <string name="stats_header">Gefundene Räume</string>
@@ -21,9 +22,13 @@
     <string name="create_new_challenge_header">Challenge erstellen</string>
     <string name="waiting_for_ptp_header">Challenge erstellen</string>
 
-
     <string name="waiting_for_peer_to_peer">Auf Peer to Peer Verbindung warten</string>
 
+    <!-- Settings fragment-->
+    <string name="username">Nutzername</string>
+    <string name="new_username_hint">z.B. Arnold123</string>
+    <string name="username_info_text">Nutzernamen dürfen nur einmal vorkommen. Wir müssen deshalb prüfen ob der neu gewählte Nutzername schon vorhanden ist.</string>
+    <string name="settings_check_username">Nutzernamen prüfen</string>
 
     <string name="create_challenge_name">Challenge Name</string>
     <string name="create_room_name">Raumname</string>
