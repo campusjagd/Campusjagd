@@ -23,6 +23,7 @@ import de.tubs.campusjagd.nfc.ReceiverActivity;
 import de.tubs.campusjagd.view.fragments.ChallengeCreateListFragment;
 import de.tubs.campusjagd.view.fragments.ChallengeListFragment;
 import de.tubs.campusjagd.view.fragments.ChallengeTransferFragment;
+import de.tubs.campusjagd.view.fragments.HighscoreFragment;
 import de.tubs.campusjagd.view.fragments.RoomListFragment;
 import de.tubs.campusjagd.view.fragments.SettingsFragment;
 import de.tubs.campusjagd.view.fragments.StatsFragment;
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity
     StatsFragment mStatsFragment;
     ChallengeTransferFragment mChallengeTransfer;
     SettingsFragment mSettingsFragment;
+    HighscoreFragment mHighScoreFragment;
 
     /**
      * Starts this activity
@@ -81,7 +83,7 @@ public class MainActivity extends AppCompatActivity
         mStatsFragment = new StatsFragment();
         mChallengeTransfer = new ChallengeTransferFragment();
         mSettingsFragment = new SettingsFragment();
-
+        mHighScoreFragment = new HighscoreFragment();
 
         // Add first fragment to the content holder
         getSupportFragmentManager().beginTransaction().add(R.id.contentHolder, mChallengeListFragment).commit();
@@ -178,6 +180,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_settings) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.contentHolder, mSettingsFragment).commit();
+        } else if (id == R.id.nav_highscore) {
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.contentHolder, mHighScoreFragment).commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
