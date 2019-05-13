@@ -1,5 +1,6 @@
 package de.tubs.campusjagd;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,14 +10,16 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.menu.MenuBuilder;
+import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import de.tubs.campusjagd.etc.PermissionManager;
 import de.tubs.campusjagd.nfc.ReceiverActivity;
-import de.tubs.campusjagd.nfc.SenderActivity;
 import de.tubs.campusjagd.view.fragments.ChallengeCreateListFragment;
 import de.tubs.campusjagd.view.fragments.ChallengeListFragment;
 import de.tubs.campusjagd.view.fragments.ChallengeTransferFragment;
@@ -84,7 +87,10 @@ public class MainActivity extends AppCompatActivity
         getSupportFragmentManager().beginTransaction().add(R.id.contentHolder, mChallengeListFragment).commit();
 
         PermissionManager.checkPermissions(this);
+
     }
+
+
 
     /**
      * Wait until permission is granted, then check if all permissions are really granted.

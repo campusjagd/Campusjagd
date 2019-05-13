@@ -6,11 +6,17 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.view.menu.MenuBuilder;
+import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -18,6 +24,8 @@ import android.widget.Toast;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 
 import de.tubs.campusjagd.R;
@@ -40,6 +48,7 @@ public class ChallengeListFragment extends Fragment {
     // Objects for the challenge lists
     RecyclerView mChallengeRecycleView;
     ChallengeListAdapter mAdapter;
+    PopupMenu mPopup;
 
     private static final int RC_BARCODE_CAPTURE = 9001;
 
@@ -57,7 +66,7 @@ public class ChallengeListFragment extends Fragment {
      * Initiates the view
      * @param view Holding view
      */
-    private void init(View view) {
+    private void init(final View view) {
         //TODO Change this mock
         Resources resources = Resources.getInstance(view.getContext());
         List<Challenge> challengeList = resources.getAllChallenges();
@@ -76,14 +85,48 @@ public class ChallengeListFragment extends Fragment {
         // Bind adapter
         mChallengeRecycleView.setAdapter(mAdapter);
 
+        // Set popup menu
+        mPopup = new PopupMenu(view.getContext(), fab);
+        /* Reflection "hack" to show menu icons on the popup field
+         * found on :
+         * https://readyandroid.wordpress.com/popup-menu-with-icon/
+         */
+        try {
+            Field[] fields = mPopup.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                if ("mPopup".equals(field.getName())) {
+                    field.setAccessible(true);
+                    Object menuPopupHelper = field.get(mPopup);
+                    Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
+                    Method setForceIcons = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
+                    setForceIcons.invoke(menuPopupHelper, true);
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            Logger.LogExeption(ChallengeListFragment.class.getSimpleName(), "Unable to init popup", e);
+        }
+        MenuInflater inflater = mPopup.getMenuInflater();
+        inflater.inflate(R.menu.popup_button, mPopup.getMenu());
+
+        mPopup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+
+            public boolean onMenuItemClick(MenuItem item) {
+                if (item.getItemId() == R.id.menu_start_location){
+
+                } else if (item.getItemId() == R.id.menu_start_QR){
+                    Intent intent = new Intent(ChallengeListFragment.this.getActivity(), BarcodeCaptureActivity.class);
+                    startActivityForResult(intent, RC_BARCODE_CAPTURE);
+                }
+                return true;
+            }
+        });
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (v.getId() == R.id.challenge_list_fab) {
-                    // launch barcode activity.
-                    Intent intent = new Intent(ChallengeListFragment.this.getActivity(), BarcodeCaptureActivity.class);
-
-                    startActivityForResult(intent, RC_BARCODE_CAPTURE);
+                    mPopup.show();
                 }
             }
         });
