@@ -28,11 +28,16 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import de.tubs.campusjagd.Database.DatabaseHelperRoom;
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.barcode.BarcodeCaptureActivity;
 import de.tubs.campusjagd.etc.Logger;
+import de.tubs.campusjagd.gps.CJLocationManager;
+import de.tubs.campusjagd.gps.GPSCalculator;
 import de.tubs.campusjagd.model.Challenge;
+import de.tubs.campusjagd.model.GPS;
 import de.tubs.campusjagd.model.Resources;
+import de.tubs.campusjagd.model.Room;
 import de.tubs.campusjagd.view.adapter.ChallengeListAdapter;
 
 import static android.support.constraint.Constraints.TAG;
@@ -43,12 +48,15 @@ import static android.support.constraint.Constraints.TAG;
  *
  * @author leon.brettin@tu-bs.de
  */
-public class ChallengeListFragment extends Fragment {
+public class ChallengeListFragment extends Fragment implements CJLocationManager.LocationCallback {
 
     // Objects for the challenge lists
     RecyclerView mChallengeRecycleView;
     ChallengeListAdapter mAdapter;
+    // The popup button with our 2 options on verifying a found room
     PopupMenu mPopup;
+    // Location manager to check for gps
+    CJLocationManager mLocationManager;
 
     private static final int RC_BARCODE_CAPTURE = 9001;
 
@@ -85,6 +93,9 @@ public class ChallengeListFragment extends Fragment {
         // Bind adapter
         mChallengeRecycleView.setAdapter(mAdapter);
 
+        // Set up location manager
+        mLocationManager = new CJLocationManager();
+
         // Set popup menu
         mPopup = new PopupMenu(view.getContext(), fab);
         /* Reflection "hack" to show menu icons on the popup field
@@ -110,11 +121,11 @@ public class ChallengeListFragment extends Fragment {
         inflater.inflate(R.menu.popup_button, mPopup.getMenu());
 
         mPopup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-
             public boolean onMenuItemClick(MenuItem item) {
                 if (item.getItemId() == R.id.menu_start_location){
-
+                    mLocationManager.getLocation(ChallengeListFragment.this.getActivity(), ChallengeListFragment.this);
                 } else if (item.getItemId() == R.id.menu_start_QR){
+                    // Launch QR-Activity
                     Intent intent = new Intent(ChallengeListFragment.this.getActivity(), BarcodeCaptureActivity.class);
                     startActivityForResult(intent, RC_BARCODE_CAPTURE);
                 }
@@ -126,6 +137,7 @@ public class ChallengeListFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (v.getId() == R.id.challenge_list_fab) {
+                    // Show popup with options
                     mPopup.show();
                 }
             }
@@ -185,6 +197,35 @@ public class ChallengeListFragment extends Fragment {
 
         } catch (NullPointerException e) {
             Logger.LogExeption(CreateNewRoomFragment.class.getSimpleName(), "Unable to set toolbar", e);
+        }
+    }
+
+    @Override
+    public void onNewLocationAvailable(GPS location) {
+        Resources resources = Resources.getInstance(ChallengeListFragment.this.getContext());
+        List<Room> nearbyRooms = GPSCalculator.checkPositionAgainstRoomList(location,
+                resources.getAllRoomsNotFoundYet());
+
+        // Add rooms depending on how many we found
+        if (nearbyRooms.size() == 0) {
+            Toast.makeText(this.getContext(), R.string.location_check_no_room_found,Toast.LENGTH_LONG).show();
+        } else if (nearbyRooms.size() == 1) {
+            Room room = nearbyRooms.get(0);
+
+            resources.handleRoomFound(room);
+
+            String answer = getString(R.string.location_check_one_room_found, room.getName());
+            Toast.makeText(this.getContext(), answer,Toast.LENGTH_LONG).show();
+        } else if (nearbyRooms.size() > 1) {
+            String roomAnswer = "";
+
+            for (Room room : nearbyRooms) {
+                resources.handleRoomFound(room);
+                roomAnswer += room.getName() + " ";
+            }
+
+            String answer = getString(R.string.location_check_more_rooms_found, roomAnswer);
+            Toast.makeText(this.getContext(), answer,Toast.LENGTH_LONG).show();
         }
     }
 }

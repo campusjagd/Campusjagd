@@ -45,6 +45,9 @@
     <string name="cancel">Abbrechen</string>
     <string name="popup_start_QR">QR-Code scannen</string>
     <string name="popup_start_Location">Position checken</string>
+    <string name="location_check_no_room_found">Es wurde leider kein neuer Raum in deiner Nähe gefunden :-/</string>
+    <string name="location_check_one_room_found">Du hast Raum %1$s gefunden.</string>
+    <string name="location_check_more_rooms_found">Du hast die Räume %1$s gefunden.</string>
 
     <!-- Barcode Strings-->
     <string name="ok">OK</string>

@@ -5,6 +5,7 @@ import android.database.Cursor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import de.tubs.campusjagd.Database.DatabaseHelperChallenge;
 import de.tubs.campusjagd.Database.DatabaseHelperRoom;
@@ -102,6 +103,22 @@ public class Resources {
         return instantiateRoomList(data);
     }
 
+    /**
+     * Filters out all rooms which are not already found yet
+     * @return List of all rooms with isRoomFound == false
+     */
+    public List<Room> getAllRoomsNotFoundYet() {
+        List<Room> allRooms = getAllRooms();
+        List<Room> notFoundYet = new ArrayList<>();
+
+        for (Room room : allRooms) {
+            if (!room.isRoomFound()) {
+                notFoundYet.add(room);
+            }
+        }
+        return notFoundYet;
+    }
+
     private List<Room> instantiateRoomList(Cursor data){
         List<Room> roomList = new ArrayList<>();
 
@@ -135,4 +152,6 @@ public class Resources {
     }
 
     public void handleBarcodeRead(String barcodeValue) { }
+
+    public void handleRoomFound(Room room){}
 }
