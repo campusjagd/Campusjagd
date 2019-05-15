@@ -154,4 +154,6 @@ public class Resources {
     public void handleBarcodeRead(String barcodeValue) { }
 
     public void handleRoomFound(Room room){}
+
+    public String getUserName(){return "Arnold123";}
 }
