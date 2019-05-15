@@ -13,6 +13,7 @@ import android.widget.EditText;
 
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.etc.Logger;
+import de.tubs.campusjagd.model.Resources;
 
 /**
  * Settings fragment to set settings like the username etc.
@@ -25,6 +26,7 @@ public class SettingsFragment extends Fragment {
     private EditText mUsernameEditText;
 
     private String mUsername;
+    Resources mResources;
 
     @Nullable
     @Override
@@ -41,15 +43,24 @@ public class SettingsFragment extends Fragment {
      * @param view The View to init
      */
     private void init(View view) {
+        mResources = Resources.getInstance(view.getContext());
+
         mCheckUsernameButton = view.findViewById(R.id.check_username_button);
         mUsernameEditText = view.findViewById(R.id.username_edit_text);
+        mUsername = mResources.getUserName();
 
         mCheckUsernameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mUsername = mUsernameEditText.getText().toString();
+                if (mResources.isUsernamePossible(mUsername)) {
+                    mResources.updateUsername(mUsername);
+                }
             }
         });
+
+
+        mUsernameEditText.setText(mUsername);
     }
 
     @Override
@@ -63,5 +74,7 @@ public class SettingsFragment extends Fragment {
         } catch (NullPointerException e) {
             Logger.LogExeption(CreateNewRoomFragment.class.getSimpleName(), "Unable to set toolbar", e);
         }
+
+        mResources = Resources.getInstance(this.getActivity());
     }
 }

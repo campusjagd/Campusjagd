@@ -156,4 +156,8 @@ public class Resources {
     public void handleRoomFound(Room room){}
 
     public String getUserName(){return "Arnold123";}
+
+    public boolean isUsernamePossible(String username){return true;}
+
+    public void updateUsername(String username){}
 }
