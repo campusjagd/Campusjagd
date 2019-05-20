@@ -29,7 +29,6 @@
         </activity>
         <activity android:name=".nfc.SenderActivity">
         </activity>
-
         <activity android:name=".nfc.ReceiverActivity">
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED"/>

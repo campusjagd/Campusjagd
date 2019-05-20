@@ -12,6 +12,8 @@ import android.os.Parcelable;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
+import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +37,8 @@ public class ReceiverActivity extends AppCompatActivity implements NfcAdapter.Cr
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        getSupportActionBar().setTitle(R.string.receive_challenge);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.fragment_challenge_transfer);
 
         mDatabaseHelperRoom = new DatabaseHelperRoom(this);
@@ -44,7 +47,7 @@ public class ReceiverActivity extends AppCompatActivity implements NfcAdapter.Cr
         //setting up the nfcAdapter to use for the data transfer
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if (nfcAdapter == null) {
-            Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.nfc_not_available, Toast.LENGTH_LONG).show();
             finish();
             return;
         }
@@ -56,9 +59,9 @@ public class ReceiverActivity extends AppCompatActivity implements NfcAdapter.Cr
     private void checkIfNfcActivated() {
         if (!nfcAdapter.isEnabled() || !nfcAdapter.isNdefPushEnabled()) {
             AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
-            alertbox.setTitle("Info");
-            alertbox.setMessage("Bitte aktivieren Sie NFC  und Android Beam");
-            alertbox.setPositiveButton("Aktivieren", new DialogInterface.OnClickListener() {
+            alertbox.setTitle(R.string.alertbox_title);
+            alertbox.setMessage(R.string.alertbox_message);
+            alertbox.setPositiveButton(R.string.alertbox_positive, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -70,7 +73,7 @@ public class ReceiverActivity extends AppCompatActivity implements NfcAdapter.Cr
                     }
                 }
             });
-            alertbox.setNegativeButton("Schließen", new DialogInterface.OnClickListener() {
+            alertbox.setNegativeButton(R.string.alertbox_negative, new DialogInterface.OnClickListener() {
 
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -84,6 +87,7 @@ public class ReceiverActivity extends AppCompatActivity implements NfcAdapter.Cr
     @Override
     public void onResume() {
         super.onResume();
+
         checkIfNfcActivated();
         // Check to see that the Activity started due to an Android Beam
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
@@ -168,5 +172,13 @@ public class ReceiverActivity extends AppCompatActivity implements NfcAdapter.Cr
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
         return null;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item){
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

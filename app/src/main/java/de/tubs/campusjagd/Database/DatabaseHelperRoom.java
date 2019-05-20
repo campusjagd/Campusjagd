@@ -141,6 +141,13 @@ public class DatabaseHelperRoom extends SQLiteOpenHelper {
         db.execSQL(query);
     }
 
+    public Cursor getRoomsNotFound(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COL_ROOMFOUND + " != 'true'";
+        Cursor data = db.rawQuery(query, null);
+        return data;
+    }
+
     /**
      * delete an entry, where id and name match
      * @param name

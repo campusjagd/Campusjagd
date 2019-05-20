@@ -71,5 +71,14 @@
     <string name="barcode_success_toast">QR-Code gefunden</string>
     <string name="title_activity_maps">Map</string>
 
+    <!-- NFC -->
+    <string name="send_challenge">Challenge senden</string>
+    <string name="receive_challenge">Challenge erhalten</string>
+    <string name="alertbox_title">Info</string>
+    <string name="alertbox_message">Bitte aktivieren Sie NFC und Android Beam</string>
+    <string name="alertbox_positive">Aktivieren</string>
+    <string name="alertbox_negative">Schließen</string>
+    <string name="nfc_not_available">NFC is nicht verfügbar</string>
+    <string name="mime_type">application/de.tubs.campusjagd</string>
 
 </resources>

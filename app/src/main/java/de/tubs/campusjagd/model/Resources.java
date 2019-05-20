@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import de.tubs.campusjagd.Database.DataBaseHelperUser;
 import de.tubs.campusjagd.Database.DatabaseHelperChallenge;
 import de.tubs.campusjagd.Database.DatabaseHelperRoom;
 
@@ -15,6 +16,7 @@ public class Resources {
     private static Resources mInstance;
     private static DatabaseHelperRoom mDatabaseHelperRoom;
     private static DatabaseHelperChallenge mDatabaseHelperChallenge;
+    private static DataBaseHelperUser mDatabaseHelperUser;
 
     public static Resources getInstance(Context context) {
         if (mInstance == null) {
@@ -27,6 +29,9 @@ public class Resources {
 
         mDatabaseHelperRoom = new DatabaseHelperRoom(context);
         mDatabaseHelperChallenge = new DatabaseHelperChallenge(context);
+        mDatabaseHelperUser = new DataBaseHelperUser(context);
+
+        mDatabaseHelperUser.addUsername("Test");
 
         Room room1 = new Room(null, new GPS(52.272899, 10.525311), "Raum 161", 2, System.currentTimeMillis(), true);
         Room room3 = new Room(null, new GPS(), "Raum 74", 10, System.currentTimeMillis(), false);
@@ -116,6 +121,13 @@ public class Resources {
                 notFoundYet.add(room);
             }
         }
+
+        //Alternatively
+        /*
+        Cursor data = mDatabaseHelperRoom.getRoomsNotFound();
+        List<Room> notFoundYet = instantiateRoomList(data);
+        */
+
         return notFoundYet;
     }
 
@@ -151,13 +163,41 @@ public class Resources {
         mDatabaseHelperRoom.addRoom(room);
     }
 
-    public void handleBarcodeRead(String barcodeValue) { }
+    public void handleBarcodeRead(String barcodeValue) {
+        //TODO find out what the barcode value looks like and compare it to the values of the corresponding room
+        //  if they match call the handleRoomFound method
+    }
 
-    public void handleRoomFound(Room room){}
+    public void handleRoomFound(Room room){
+        mDatabaseHelperRoom.updateRoomFound(room);
+    }
 
-    public String getUserName(){return "Arnold123";}
+    public String getUserName(){
+        Cursor data = mDatabaseHelperUser.getUsername();
+        //get the value from the database in column 0
+        String username = "";
+        while (data.moveToNext()) {
+            username = data.getString(0);
+        }
+        return username;
+    }
 
-    public boolean isUsernamePossible(String username){return true;}
+    public boolean isUsernamePossible(String username){
+        //TODO check on the Server, whether the username to be set is already taken or not
+        return true;
+    }
 
-    public void updateUsername(String username){}
+    public void updateUsername(String username){
+        if (isUsernamePossible(username)){
+
+            Cursor data = mDatabaseHelperUser.getUsername();
+            //get the value from the database in column 0
+            String oldUsername = "";
+            while (data.moveToNext()) {
+                oldUsername = data.getString(0);
+            }
+            mDatabaseHelperUser.updateUsername(oldUsername, username);
+            //TODO update username on the server, if possible
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package de.tubs.campusjagd.nfc;
 
+import android.app.ActionBar;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -10,8 +11,11 @@ import android.nfc.NfcEvent;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
+import android.view.Window;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -23,6 +27,7 @@ import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.model.Challenge;
 import de.tubs.campusjagd.model.GPS;
 import de.tubs.campusjagd.model.Room;
+import de.tubs.campusjagd.view.fragments.ChallengeCreateListFragment;
 
 import static android.nfc.NdefRecord.createMime;
 
@@ -34,20 +39,26 @@ public class SenderActivity extends AppCompatActivity implements NfcAdapter.Crea
     private static DatabaseHelperRoom mDatabaseHelperRoom;
     private String challengeName;
 
+    ChallengeCreateListFragment mChallengeCreateListFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setTitle(R.string.send_challenge);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.fragment_peer_to_peer);
 
         mDatabaseHelperRoom = new DatabaseHelperRoom(this);
         mDatabaseHelperChallenge = new DatabaseHelperChallenge(this);
+
+        mChallengeCreateListFragment = new ChallengeCreateListFragment();
 
         challengeName = getIntent().getStringExtra("ChallengeName");
 
         //setting up the nfcAdapter to use for the data transfer
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if (nfcAdapter == null){
-            Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.nfc_not_available, Toast.LENGTH_LONG).show();
             finish();
             return;
         }
@@ -62,12 +73,11 @@ public class SenderActivity extends AppCompatActivity implements NfcAdapter.Crea
      * open up a dialogbox, if nfc and android beam are not activated
      */
     private void checkIfNfcActivated() {
-        if (!nfcAdapter.isEnabled() || !nfcAdapter.isNdefPushEnabled())
-        {
+        if (!nfcAdapter.isEnabled() || !nfcAdapter.isNdefPushEnabled()) {
             AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
-            alertbox.setTitle("Info");
-            alertbox.setMessage("Bitte aktivieren Sie NFC und Android Beam");
-            alertbox.setPositiveButton("Aktivieren", new DialogInterface.OnClickListener() {
+            alertbox.setTitle(R.string.alertbox_title);
+            alertbox.setMessage(R.string.alertbox_message);
+            alertbox.setPositiveButton(R.string.alertbox_positive, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -79,7 +89,7 @@ public class SenderActivity extends AppCompatActivity implements NfcAdapter.Crea
                     }
                 }
             });
-            alertbox.setNegativeButton("Schließen", new DialogInterface.OnClickListener() {
+            alertbox.setNegativeButton(R.string.alertbox_negative, new DialogInterface.OnClickListener() {
 
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -131,7 +141,7 @@ public class SenderActivity extends AppCompatActivity implements NfcAdapter.Crea
         //Create a ndefMessage to send via nfc
         NdefMessage msg = new NdefMessage(
                 new NdefRecord[] { createMime(
-                        "application/de.tubs.campusjagd", text.getBytes())
+                        String.valueOf(R.string.mime_type), text.getBytes())
                         /**
                          * The Android Application Record (AAR) is commented out. When a device
                          * receives a push with an AAR in it, the application specified in the AAR
@@ -190,6 +200,14 @@ public class SenderActivity extends AppCompatActivity implements NfcAdapter.Crea
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
 
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item){
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }
