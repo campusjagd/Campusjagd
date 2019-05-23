@@ -2,6 +2,7 @@ package de.tubs.campusjagd.model;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,8 @@ public class Resources {
         Room room6 = new Room(null, new GPS(), "Raum 262", 6, System.currentTimeMillis(), false);
         //Room room7 = new Room(null, new GPS(), "Audimax", 6, System.currentTimeMillis(), true);
 
+        //Log.d("RRRRRRRRR", room1.toString());
+
         mDatabaseHelperRoom.addRoom(room1);
         mDatabaseHelperRoom.addRoom(room2);
         mDatabaseHelperRoom.addRoom(room3);
@@ -48,6 +51,7 @@ public class Resources {
         mDatabaseHelperRoom.addRoom(room5);
         mDatabaseHelperRoom.addRoom(room6);
         //mDatabaseHelperRoom.addRoom(room7);
+
 
         ArrayList<Room> roomlist1 = new ArrayList<>();
         roomlist1.add(room1);
@@ -164,8 +168,21 @@ public class Resources {
     }
 
     public void handleBarcodeRead(String barcodeValue) {
-        //TODO find out what the barcode value looks like and compare it to the values of the corresponding room
-        //  if they match call the handleRoomFound method
+        //barcode should look like:     name;gps;points;timestamp;
+        String[] values = barcodeValue.split(";");
+        String roomName = values[0];
+        String gps = values[1];
+        String points = values[2];
+        String timestamp = values[3];
+        Cursor data = mDatabaseHelperRoom.getSpecificRoom(roomName);
+        Room room = new Room(null, GPS.stringToGPS(gps), roomName, Integer.getInteger(points), Long.getLong(timestamp), true);
+        //if the room is not already known in the database, then it is added, if it is known it will
+        // be marked as found
+        if (data.getCount() == 0){
+            mDatabaseHelperRoom.addRoom(room);
+        }else{
+            handleRoomFound(room);
+        }
     }
 
     public void handleRoomFound(Room room){

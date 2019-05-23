@@ -65,4 +65,8 @@ public class Room {
     public void setRoomFound(boolean roomFound) {
         this.roomFound = roomFound;
     }
+
+    public String toString(){
+        return this.getName()+";"+this.getGps()+";"+this.getPoints()+";"+this.getTimestamp()+";";
+    }
 }
