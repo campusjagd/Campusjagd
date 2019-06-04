@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2> Highscores </h2>
+  <style>
+  table {
+      counter-reset: rowNumber;
+  }
+
+  table tr > td:first-child {
+      counter-increment: rowNumber;
+  }
+
+  table tr td:first-child::before {
+      content: counter(rowNumber);
+      min-width: 1em;
+      margin-right: 0.5em;
+  }
+</style>
+<table class="responsive-table highlight striped">
+<thead>
+  <tr>
+      <th></th>
+      <th>Name</th>
+      <th>Score</th>
+  </tr>
+</thead>
+
+<tbody>
+  <!-- <tr>
+    <td></td>
+    <td>Alvin</td>
+    <td>5000</td>
+  </tr> -->
+
+  {% for s in scorelist %}
+  <tr>
+    <td></td>
+    <td> {{s.name}} </td>
+    <td> {{s.points}} </td>
+  </tr>
+  {% endfor %}
+
+</tbody>
+</table>
+{% endblock %}
