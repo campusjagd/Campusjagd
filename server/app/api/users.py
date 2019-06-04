@@ -52,5 +52,5 @@ def add_users():
         db.session.commit()
     response = jsonify(user.to_dict())
     response.status_code = 201
-    response.headers['Location'] = url_for('api.add_user', id=user.id)
+    response.headers['Location'] = url_for('api.add_users', id=user.id)
     return response
