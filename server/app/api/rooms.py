@@ -20,8 +20,8 @@ def get_room_by_name(name):
 @bp.route('/room', methods=['POST'])
 def add_room():
     data = request.get_json() or {}
-    if 'name' not in data:
-        return bad_request('must include roomname')
+    if 'name' not in data or 'gpsposition' not in data:
+        return bad_request('must include roomname and gpsposition')
     if db.session.query(Room).filter_by(name=data['name'].upper()).first():
         return bad_request('room aready existing')
     else:
