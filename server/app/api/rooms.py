@@ -27,7 +27,7 @@ def add_room():
     else:
         # add room with points
         room = Room()
-        room.name = data['name']
+        room.name = data['name'].upper()
         room.gpsposition = data['gpsposition']
         room.points = data['points']
         db.session.add(room)

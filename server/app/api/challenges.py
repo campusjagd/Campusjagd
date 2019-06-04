@@ -22,7 +22,7 @@ def create_challenge():
     data = request.get_json() or {}
     if 'name' not in data:
         return bad_request('must include challengename')
-    if db.session.query(Challenge).filter_by(name=data['name'].upper()).first():
+    if db.session.query(Challenge).filter_by(name=data['name']).first():
         return bad_request('challenge aready existing')
     else:
         # add challenge
@@ -31,7 +31,7 @@ def create_challenge():
         # rooms have to exist
         room_list = data['rooms'].split(',')
         for room in room_list:
-            room = room.trim().upper()
+            room = room.strip().upper()
             room_from_db = db.session.query(Room).filter_by(name = room).first()
             challenge.rooms.append(room_from_db)
         db.session.add(challenge)
