@@ -1,7 +1,7 @@
 from app.api import bp
-from flask import url_for, jsonify
+from flask import url_for, jsonify, request
 from app import db
-from app.models import Challenge
+from app.models import Challenge, Room
 from app.api.errors import bad_request
 
 @bp.route('/challenges', methods=['GET'])

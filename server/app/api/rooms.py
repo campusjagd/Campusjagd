@@ -1,5 +1,5 @@
 from app.api import bp
-from flask import url_for, jsonify
+from flask import url_for, jsonify, request
 from app import db
 from app.models import Room
 from app.api.errors import bad_request
