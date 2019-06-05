@@ -14,7 +14,7 @@ def get_challenges():
 
 @bp.route('/challenge/<string:name>', methods=['GET'])
 def get_challenge_by_name(name):
-    search_name = name.upper()
+    search_name = name
     return jsonify(db.session.query(Challenge).filter_by(name=search_name).first_or_404().to_dict())
 
 @bp.route('/challenge', methods=['POST'])
