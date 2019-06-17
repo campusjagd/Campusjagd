@@ -170,7 +170,7 @@ public class ChallengeListFragment extends Fragment implements CJLocationManager
                     Barcode barcode = data.getParcelableExtra(BarcodeCaptureActivity.BarcodeObject);
                     Log.d(TAG, "Barcode read: " + barcode.displayValue);
                     Toast.makeText(this.getContext(), R.string.barcode_success_toast,Toast.LENGTH_LONG).show();
-
+                    //Toast.makeText(this.getContext(), "Barcode read: " + barcode.displayValue ,Toast.LENGTH_LONG).show();
                     // Give to Resources
                     Resources.getInstance(ChallengeListFragment.this.getContext()).handleBarcodeRead(barcode.displayValue);
                     mAdapter.notifyDataSetChanged();

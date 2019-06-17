@@ -159,4 +159,5 @@ public class DatabaseHelperRoom extends SQLiteOpenHelper {
         Log.d(TAG, "deleteName: deleting: " + name);
         db.execSQL(query);
     }
+
 }

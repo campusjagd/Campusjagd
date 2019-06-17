@@ -3,14 +3,44 @@ package de.tubs.campusjagd.model;
 import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
+import android.widget.Toast;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 import de.tubs.campusjagd.Database.DataBaseHelperUser;
 import de.tubs.campusjagd.Database.DatabaseHelperChallenge;
 import de.tubs.campusjagd.Database.DatabaseHelperRoom;
+import de.tubs.campusjagd.R;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.CertificatePinner;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class Resources {
 
@@ -18,6 +48,12 @@ public class Resources {
     private static DatabaseHelperRoom mDatabaseHelperRoom;
     private static DatabaseHelperChallenge mDatabaseHelperChallenge;
     private static DataBaseHelperUser mDatabaseHelperUser;
+    private OkHttpClient okHttpClient;
+
+    String hostnameServer = "134.169.47.155";
+    String challenge_url = "/api/challenge";
+    String room_url = "/api/room";
+    String user_url = "/api/users";
 
     public static Resources getInstance(Context context) {
         if (mInstance == null) {
@@ -32,17 +68,17 @@ public class Resources {
         mDatabaseHelperChallenge = new DatabaseHelperChallenge(context);
         mDatabaseHelperUser = new DataBaseHelperUser(context);
 
+        setupClient(context);
+
         mDatabaseHelperUser.addUsername("Test");
 
         Room room1 = new Room(null, new GPS(52.272899, 10.525311), "Raum 161", 2, System.currentTimeMillis(), true);
         Room room3 = new Room(null, new GPS(), "Raum 74", 10, System.currentTimeMillis(), false);
         Room room2 = new Room(null, new GPS(52.274760, 10.526023), "Mensa", 1, System.currentTimeMillis(), true);
         Room room4 = new Room(null, new GPS(), "Raum 111", 2, System.currentTimeMillis(), false);
-        Room room5 = new Room(null, new GPS(52.272678, 10.526844), "Pk 2.2", 4, System.currentTimeMillis(),true);
+        Room room5 = new Room(null, new GPS(52.272678, 10.526844), "Pk 2.2", 4, System.currentTimeMillis(), true);
         Room room6 = new Room(null, new GPS(), "Raum 262", 6, System.currentTimeMillis(), false);
         //Room room7 = new Room(null, new GPS(), "Audimax", 6, System.currentTimeMillis(), true);
-
-        //Log.d("RRRRRRRRR", room1.toString());
 
         mDatabaseHelperRoom.addRoom(room1);
         mDatabaseHelperRoom.addRoom(room2);
@@ -80,24 +116,66 @@ public class Resources {
 
     }
 
+    /**
+     * setups the client to use the server.pem or the server.cer as a trustanchor for connecting to
+     * the server. Furthermore because the host is unverified the hostname is whitelistet to allow access
+     * @param context
+     */
+    void setupClient(Context context){
+        SSLContext sslContext;
+        TrustManager[] trustManagers;
+        try {
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            keyStore.load(null, null);
+            InputStream certInputStream = context.getAssets().open("server.pem");
+            BufferedInputStream bis = new BufferedInputStream(certInputStream);
+            CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+            while (bis.available() > 0) {
+                Certificate cert = certificateFactory.generateCertificate(bis);
+                keyStore.setCertificateEntry(hostnameServer, cert);
+            }
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            trustManagerFactory.init(keyStore);
+            trustManagers = trustManagerFactory.getTrustManagers();
+            sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustManagers, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustManagers[0]);
+        builder.hostnameVerifier(new HostnameVerifier() {
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                if (hostname.equals(hostnameServer)) {
+                    return true;
+                }
+                return false;
+            }
+        });
+        okHttpClient = builder.build();
+    }
+
     public List<Challenge> getAllChallenges() {
         List<Challenge> challengeList = new ArrayList<>();
 
         Cursor data = mDatabaseHelperChallenge.getAllChallenges();
 
-        while(data.moveToNext()){
+        while (data.moveToNext()) {
             //get the value from the database in column 0 to 1 (equal to column-naming-scheme at the
             //top of the databasehelperroom class. Meaning COL0 == COL_NAME, COL1 == COL_ROOMS)
             //then add it to the arraylist
             String name = data.getString(0);
             String roomsAsString = data.getString(1);
-           String[] roomValues = roomsAsString.split(";");
-           List<Room> roomList = new ArrayList<>();
-           for (String roomName : roomValues){
-               Cursor roomData = mDatabaseHelperRoom.getSpecificRoom(roomName);
-               //calling the method with a cursor containing only 1 entry
-               roomList.addAll(instantiateRoomList(roomData));
-           }
+            String[] roomValues = roomsAsString.split(";");
+            List<Room> roomList = new ArrayList<>();
+            for (String roomName : roomValues) {
+                Cursor roomData = mDatabaseHelperRoom.getSpecificRoom(roomName);
+                //calling the method with a cursor containing only 1 entry
+                roomList.addAll(instantiateRoomList(roomData));
+            }
 
             Challenge challenge = new Challenge(name, roomList);
             challengeList.add(challenge);
@@ -106,6 +184,7 @@ public class Resources {
     }
 
     public List<Room> getAllRooms() {
+        getTopTenPlayers();
         Cursor data = mDatabaseHelperRoom.getAllRooms();
 
         //Calling the function with a cursor, that contains multiple entries
@@ -114,6 +193,7 @@ public class Resources {
 
     /**
      * Filters out all rooms which are not already found yet
+     *
      * @return List of all rooms with isRoomFound == false
      */
     public List<Room> getAllRoomsNotFoundYet() {
@@ -135,10 +215,10 @@ public class Resources {
         return notFoundYet;
     }
 
-    private List<Room> instantiateRoomList(Cursor data){
+    private List<Room> instantiateRoomList(Cursor data) {
         List<Room> roomList = new ArrayList<>();
 
-        while(data.moveToNext()){
+        while (data.moveToNext()) {
             //get the value from the database in column 0 to 4 (equal to column-naming-scheme at the
             //top of the databasehelperroom class. Meaning COL0 == COL_NAME, COL1 == COL_ and so on)
             //then add it to the arraylist
@@ -147,9 +227,9 @@ public class Resources {
             int points = data.getInt(2);
             long timestamp = Long.valueOf(data.getString(3));
             boolean roomFound;
-            if (data.getString(4).equals("true")){
+            if (data.getString(4).equals("true")) {
                 roomFound = true;
-            }else{
+            } else {
                 roomFound = false;
             }
 
@@ -159,7 +239,7 @@ public class Resources {
         return roomList;
     }
 
-    public void saveChallenge(Challenge challenge){
+    public void saveChallenge(Challenge challenge) {
         mDatabaseHelperChallenge.addChallenge(challenge);
     }
 
@@ -168,28 +248,34 @@ public class Resources {
     }
 
     public void handleBarcodeRead(String barcodeValue) {
-        //barcode should look like:     name;gps;points;timestamp;
+        //barcode looks like:     name;long;lat;points;timestamp;
+
         String[] values = barcodeValue.split(";");
         String roomName = values[0];
-        String gps = values[1];
-        String points = values[2];
-        String timestamp = values[3];
+        String long_barcode = values[1];
+        double longitute = Double.parseDouble(long_barcode.split(":")[1]);
+        String lat_barcode = values[2];
+        double latitude = Double.parseDouble(lat_barcode.split(":")[1]);
+        String points = values[3];
+        String timestamp = values[4];
         Cursor data = mDatabaseHelperRoom.getSpecificRoom(roomName);
-        Room room = new Room(null, GPS.stringToGPS(gps), roomName, Integer.getInteger(points), Long.getLong(timestamp), true);
+        Room room = new Room(null, new GPS(latitude, longitute), roomName, Integer.parseInt(points), Long.parseLong(timestamp), true);
         //if the room is not already known in the database, then it is added, if it is known it will
         // be marked as found
-        if (data.getCount() == 0){
+        if (data.getCount() == 0) {
+            //romm does not already exist
             mDatabaseHelperRoom.addRoom(room);
-        }else{
+        } else {
+            //room already exists
             handleRoomFound(room);
         }
     }
 
-    public void handleRoomFound(Room room){
+    public void handleRoomFound(Room room) {
         mDatabaseHelperRoom.updateRoomFound(room);
     }
 
-    public String getUserName(){
+    public String getUserName() {
         Cursor data = mDatabaseHelperUser.getUsername();
         //get the value from the database in column 0
         String username = "";
@@ -199,13 +285,13 @@ public class Resources {
         return username;
     }
 
-    public boolean isUsernamePossible(String username){
+    public boolean isUsernamePossible(String username) {
         //TODO check on the Server, whether the username to be set is already taken or not
         return true;
     }
 
-    public void updateUsername(String username){
-        if (isUsernamePossible(username)){
+    public void updateUsername(String username) {
+        if (isUsernamePossible(username)) {
 
             Cursor data = mDatabaseHelperUser.getUsername();
             //get the value from the database in column 0
@@ -216,5 +302,34 @@ public class Resources {
             mDatabaseHelperUser.updateUsername(oldUsername, username);
             //TODO update username on the server, if possible
         }
+    }
+
+    //TODO methods for posting rooms to the server
+    //  posting self made challenges
+    //  getting all challenges
+    //  getting all specific room
+
+    public List<Player> getTopTenPlayers() {
+        List<Player> playerTopTen = new ArrayList<>();
+        String url = "http://" + hostnameServer + user_url;
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    final String jsonResponse = response.body().string();
+                    //TODO use response
+                }
+            }
+        });
+
+        return playerTopTen;
     }
 }
