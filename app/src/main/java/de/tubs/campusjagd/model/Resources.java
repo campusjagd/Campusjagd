@@ -68,8 +68,6 @@ public class Resources {
         mDatabaseHelperChallenge = new DatabaseHelperChallenge(context);
         mDatabaseHelperUser = new DataBaseHelperUser(context);
 
-        setupClient(context);
-
         mDatabaseHelperUser.addUsername("Test");
 
         Room room1 = new Room(null, new GPS(52.272899, 10.525311), "Raum 161", 2, System.currentTimeMillis(), true);
@@ -113,6 +111,8 @@ public class Resources {
         mDatabaseHelperChallenge.addChallenge(challenge1);
         mDatabaseHelperChallenge.addChallenge(challenge2);
         mDatabaseHelperChallenge.addChallenge(challenge3);
+
+        setupClient(context);
 
     }
 
@@ -184,7 +184,6 @@ public class Resources {
     }
 
     public List<Room> getAllRooms() {
-        getTopTenPlayers();
         Cursor data = mDatabaseHelperRoom.getAllRooms();
 
         //Calling the function with a cursor, that contains multiple entries

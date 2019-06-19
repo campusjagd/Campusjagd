@@ -1,5 +1,6 @@
 package de.tubs.campusjagd.nfc;
 
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -31,12 +32,20 @@ import de.tubs.campusjagd.model.Room;
 public class ReceiverActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback {
 
     private NfcAdapter nfcAdapter;
+    PendingIntent pendingIntent;
     private DatabaseHelperRoom mDatabaseHelperRoom;
     private DatabaseHelperChallenge mDatabaseHelperChallenge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        //Create a PendingIntent object so the Android system can populate it with the
+        //details of the tag when it is scanned.
+        pendingIntent = PendingIntent.getActivity(
+                this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+
         getSupportActionBar().setTitle(R.string.receive_challenge);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.fragment_challenge_transfer);
@@ -51,6 +60,12 @@ public class ReceiverActivity extends AppCompatActivity implements NfcAdapter.Cr
             finish();
             return;
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        nfcAdapter.disableForegroundDispatch(this);
     }
 
     /**
@@ -87,6 +102,11 @@ public class ReceiverActivity extends AppCompatActivity implements NfcAdapter.Cr
     @Override
     public void onResume() {
         super.onResume();
+
+        //The foreground dispatch system allows an activity to intercept an intent and claim
+        // priority over other activities that handle the same intent
+        //possible to set filters and techlists, might not be necessary
+        nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
 
         checkIfNfcActivated();
         // Check to see that the Activity started due to an Android Beam
