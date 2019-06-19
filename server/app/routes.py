@@ -8,6 +8,7 @@ class ChallengeItem:
     official = ""
     rooms = ""
     points = ""
+    id = ""
 
 @app.route('/')
 @app.route('/index')
@@ -26,9 +27,22 @@ def challenges():
     for c in db.session.query(Challenge).all():
         challenge_item = ChallengeItem()
         challenge_item.title = c.name
+        challenge_item.id = c.id
         challenge_item.official = c.official
         for r in c.rooms:
             challenge_item.rooms += r.name
             challenge_item.points += str(r.points)
         challengelist.append(challenge_item)
     return render_template('challenges.html', challengelist = challengelist)
+
+@app.route('/challenge/<int:id>')
+def scan_challenge(id):
+    challenge = db.session.query(Challenge).filter_by(id = id).first_or_404()
+    challenge_item = ChallengeItem()
+    challenge_item.title = challenge.name
+    challenge_item.id = challenge.id
+    challenge_item.official = challenge.official
+    for r in challenge.rooms:
+        challenge_item.rooms += r.name
+        challenge_item.points += str(r.points)
+    return render_template('scanChallenge.html', c = challenge_item, challenge_object=challenge)
