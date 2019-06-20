@@ -190,6 +190,9 @@ public class ChallengeListFragment extends Fragment implements CJLocationManager
     @Override
     public void onResume() {
         super.onResume();
+
+        mAdapter.notifyDataSetChanged();
+
         try {
             // Set toolbar
             Toolbar actionBarToolbar = this.getActivity().findViewById(R.id.toolbar);

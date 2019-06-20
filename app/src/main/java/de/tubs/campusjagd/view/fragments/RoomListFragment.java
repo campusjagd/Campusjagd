@@ -34,6 +34,8 @@ public class RoomListFragment extends Fragment {
     //Fragment to start when a new room should be created
     private Fragment mCreateNewRoomFragment;
 
+    private ExtendedRoomAdapter mRoomAdapter;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -63,8 +65,8 @@ public class RoomListFragment extends Fragment {
 
         //Set up adapter
         // We reuse the adapter from the challenge list here. If we need more special styling we can create a new one.
-        ExtendedRoomAdapter roomAdapter = new ExtendedRoomAdapter(mRoomList, RoomListFragment.this.getActivity());
-        roomRecyclerView.setAdapter(roomAdapter);
+        mRoomAdapter = new ExtendedRoomAdapter(mRoomList, RoomListFragment.this.getActivity());
+        roomRecyclerView.setAdapter(mRoomAdapter);
 
         // Set up fragment
         mCreateNewRoomFragment = new CreateNewRoomFragment();
@@ -93,6 +95,8 @@ public class RoomListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
+        mRoomAdapter.notifyDataSetChanged();
 
         try {
             // Set toolbar

@@ -89,6 +89,9 @@ public class ChallengeCreateListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
+        mAdapter.notifyDataSetChanged();
+
         try {
             // Set toolbar
             Toolbar actionBarToolbar = this.getActivity().findViewById(R.id.toolbar);
