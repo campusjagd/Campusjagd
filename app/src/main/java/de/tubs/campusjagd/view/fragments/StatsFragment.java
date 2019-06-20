@@ -54,7 +54,7 @@ public class StatsFragment extends Fragment implements OnMapReadyCallback {
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.LogExeption(StatsFragment.class.getSimpleName(), "Unable to initialize Maps",e);
         }
         mMapView.getMapAsync(this);
 

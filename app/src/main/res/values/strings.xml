@@ -10,8 +10,8 @@
 
     <!-- Menu items-->
     <string name="menu_main">Hauptmenü</string>
-    <string name="menu_challenge_list">Alle Challenges</string>
-    <string name="menu_roomlist">Alle Räume</string>
+    <string name="menu_challenge_list">Challenge erstellen</string>
+    <string name="menu_roomlist">Alle POIs</string>
     <string name="menu_stats">Status</string>
     <string name="menu_challenge_transfer">Challenge erhalten</string>
     <string name="menu_settings">Einstellungen</string>
@@ -22,8 +22,8 @@
     <string name="highscore_header_points">Punkte:</string>
 
     <!-- Menu toolbar header-->
-    <string name="stats_header">Gefundene Räume</string>
-    <string name="create_new_room_header">Raum erstellen</string>
+    <string name="stats_header">Gefundene POIs</string>
+    <string name="create_new_room_header">POI erstellen</string>
     <string name="create_new_challenge_header">Challenge erstellen</string>
     <string name="waiting_for_ptp_header">Challenge erstellen</string>
 
@@ -38,7 +38,7 @@
     <string name="settings_check_username_failure">Das hat leider nicht funktioniert. Der Nutzername ist schon weg :-/</string>
 
     <string name="create_challenge_name">Challenge Name</string>
-    <string name="create_room_name">Raumname</string>
+    <string name="create_room_name">POI-Name</string>
     <string name="create_room_name_hint">z.B. IZ 160</string>
     <string name="create_room_points">Punkte</string>
     <string name="create_room_points_hint">z.B. 10</string>
@@ -52,9 +52,9 @@
     <string name="cancel">Abbrechen</string>
     <string name="popup_start_QR">QR-Code scannen</string>
     <string name="popup_start_Location">Position checken</string>
-    <string name="location_check_no_room_found">Es wurde leider kein neuer Raum in deiner Nähe gefunden :-/</string>
-    <string name="location_check_one_room_found">Du hast Raum %1$s gefunden.</string>
-    <string name="location_check_more_rooms_found">Du hast die Räume %1$s gefunden.</string>
+    <string name="location_check_no_room_found">Es wurde leider kein neuer POI in deiner Nähe gefunden :-/</string>
+    <string name="location_check_one_room_found">Du hast POI %1$s gefunden.</string>
+    <string name="location_check_more_rooms_found">Du hast die POIs %1$s gefunden.</string>
 
     <!-- Barcode Strings-->
     <string name="ok">OK</string>
