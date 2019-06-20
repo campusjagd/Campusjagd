@@ -34,6 +34,8 @@
     <string name="new_username_hint">z.B. Arnold123</string>
     <string name="username_info_text">Nutzernamen dürfen nur einmal vorkommen. Wir müssen deshalb prüfen ob der neu gewählte Nutzername schon vorhanden ist.</string>
     <string name="settings_check_username">Nutzernamen prüfen</string>
+    <string name="settings_check_username_success">Nutzername wurde erfolgreich geändert.</string>
+    <string name="settings_check_username_failure">Das hat leider nicht funktioniert. Der Nutzername ist schon weg :-/</string>
 
     <string name="create_challenge_name">Challenge Name</string>
     <string name="create_room_name">Raumname</string>
