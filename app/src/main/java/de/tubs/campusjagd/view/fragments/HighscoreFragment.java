@@ -46,6 +46,7 @@ public class HighscoreFragment extends Fragment {
                 points += room.getPoints();
             }
         }
+        resources.setUserScore(points);
         mOwnPointsTextView.setText(Integer.toString(points));
 
     }

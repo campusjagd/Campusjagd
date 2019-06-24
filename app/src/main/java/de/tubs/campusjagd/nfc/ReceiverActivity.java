@@ -14,18 +14,16 @@ import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import de.tubs.campusjagd.Database.DatabaseHelperChallenge;
-import de.tubs.campusjagd.Database.DatabaseHelperRoom;
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.model.Challenge;
 import de.tubs.campusjagd.model.GPS;
+import de.tubs.campusjagd.model.Resources;
 import de.tubs.campusjagd.model.Room;
 
 
@@ -33,13 +31,12 @@ public class ReceiverActivity extends AppCompatActivity implements NfcAdapter.Cr
 
     private NfcAdapter nfcAdapter;
     PendingIntent pendingIntent;
-    private DatabaseHelperRoom mDatabaseHelperRoom;
-    private DatabaseHelperChallenge mDatabaseHelperChallenge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //setting up the nfcAdapter to use for the data transfer
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         //Create a PendingIntent object so the Android system can populate it with the
         //details of the tag when it is scanned.
@@ -50,11 +47,7 @@ public class ReceiverActivity extends AppCompatActivity implements NfcAdapter.Cr
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.fragment_challenge_transfer);
 
-        mDatabaseHelperRoom = new DatabaseHelperRoom(this);
-        mDatabaseHelperChallenge = new DatabaseHelperChallenge(this);
-
-        //setting up the nfcAdapter to use for the data transfer
-        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        //checking, if nfc is available or not 
         if (nfcAdapter == null) {
             Toast.makeText(this, R.string.nfc_not_available, Toast.LENGTH_LONG).show();
             finish();
@@ -142,11 +135,11 @@ public class ReceiverActivity extends AppCompatActivity implements NfcAdapter.Cr
             String roomName = roomValues[0];
             GPS gps = GPS.stringToGPS(roomValues[1]);
             int points = Integer.parseInt(roomValues[2]);
-            long timestamp = Long.valueOf(roomValues[3]);
+            String timestamp = roomValues[3];
             boolean found = false;
 
             //if room is not already known add it with not-found-flag
-            Cursor roomData = mDatabaseHelperRoom.getSpecificRoom(roomName);
+            Cursor roomData = Resources.getInstance(this).getSpecificRoom(roomName);
             //the cursor will always contain a name column, but if the room is already known the cursor
             //should contain 5 columns
             if (roomData.getCount() > 1) {
@@ -169,14 +162,17 @@ public class ReceiverActivity extends AppCompatActivity implements NfcAdapter.Cr
             //add the room to the database. if it is already known nothing happens, if not it has to be
             //added otherwise the room will never show, if the challenge is selected
             Room room = new Room(null, gps, roomName, points, timestamp, found);
-            mDatabaseHelperRoom.addRoom(room);
+            Resources.getInstance(this).addRoom(room);
+            //after adding the room check if there is a room by that name on the server,
+            //if that's the case it will be locally deleted and reentered
+            Resources.getInstance(this).getAndSaveSpecificRoomServer(roomName);
             roomList.add(room);
         }
 
         Challenge challenge = new Challenge(challengeName, roomList);
-        mDatabaseHelperChallenge.addChallenge(challenge);
+        Resources.getInstance(this).addChallenge(challenge);
+        Resources.getInstance(this).getAndSaveSpecificChallengeServer(challengeName);
     }
-
 
     @Override
     public void onNewIntent(Intent intent) {
@@ -194,7 +190,7 @@ public class ReceiverActivity extends AppCompatActivity implements NfcAdapter.Cr
         return null;
     }
 
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
             return true;

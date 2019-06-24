@@ -66,7 +66,7 @@ public class DatabaseHelperRoom extends SQLiteOpenHelper {
         String s = room.getGps().toString();
         contentValues.put(COL_GPS, room.getGps().toString());
         contentValues.put(COL_POINTS, room.getPoints());
-        contentValues.put(COL_TIMESTAMP, Long.toString(room.getTimestamp()));
+        contentValues.put(COL_TIMESTAMP, room.getTimestamp());
         if (room.isRoomFound()){
             contentValues.put(COL_ROOMFOUND, "true");
         }else{
@@ -156,7 +156,15 @@ public class DatabaseHelperRoom extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "DELETE FROM " + TABLE_NAME + " WHERE " + COL_NAME + " = '" + name + "'";
         Log.d(TAG, "deleteName: query: " + query);
-        Log.d(TAG, "deleteName: deleting: " + name);
+        Log.d(TAG, "deleteName: updating: " + name);
+        db.execSQL(query);
+    }
+
+    public void updateRoom(Room room){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "UPDATE " + TABLE_NAME + " SET " + COL_GPS + " = '" + room.getGps() + "', " + COL_POINTS + " = '" + room.getPoints() + "', "
+                + COL_TIMESTAMP + " = '" + room.getTimestamp() + "', " + COL_ROOMFOUND + " = '" + room.isRoomFound() + "' WHERE " + COL_NAME + " = '" + room.getName()+"'";
+        Log.d(TAG, "updateName: query: " + query);
         db.execSQL(query);
     }
 

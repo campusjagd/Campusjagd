@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import de.tubs.campusjagd.MainActivity;
@@ -127,7 +128,7 @@ public class CreateNewRoomFragment extends Fragment {
         }
 
         // Every value is set up correctly
-        Room room = new Room(null, mGPSPosition, roomName, points, new Date().getTime(), false);
+        Room room = new Room(null, mGPSPosition, roomName, points, Calendar.getInstance().getTime().toString(), false);
         Resources.getInstance(this.getContext()).saveRoom(room);
 
         return true;

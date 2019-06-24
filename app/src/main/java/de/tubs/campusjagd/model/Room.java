@@ -6,10 +6,10 @@ public class Room {
     private GPS gps;
     private String name;
     private int points;
-    private long timestamp;
+    private String timestamp;
     private boolean roomFound;
 
-    public Room(QRCode QRCode, GPS gps, String name, int points, long timestamp, boolean roomFound) {
+    public Room(QRCode QRCode, GPS gps, String name, int points, String timestamp, boolean roomFound) {
         this.QRCode = QRCode;
         this.gps = gps;
         this.name = name;
@@ -50,11 +50,11 @@ public class Room {
         this.points = points;
     }
 
-    public long getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(long timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 

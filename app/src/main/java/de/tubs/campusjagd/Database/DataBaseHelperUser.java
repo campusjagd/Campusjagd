@@ -7,15 +7,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import de.tubs.campusjagd.model.Room;
-
 public class DataBaseHelperUser extends SQLiteOpenHelper {
 
     private static final String TAG = "DatabaseHelperUser";
 
     private static final String TABLE_NAME = "user_table";
     private static final String COL_NAME = "name";
-    //private static final String COL_SCORE = "score";
+    private static final String COL_SCORE = "score";
 
     public DataBaseHelperUser(Context context){
         super(context, TABLE_NAME, null, 1);
@@ -28,7 +26,7 @@ public class DataBaseHelperUser extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String createTable = "CREATE TABLE " + TABLE_NAME + " ( " +
-                COL_NAME + " TEXT PRIMARY KEY) ";
+                COL_NAME + " TEXT PRIMARY KEY, " + COL_SCORE + " INTEGER) ";
         db.execSQL(createTable);
     }
 
@@ -51,7 +49,7 @@ public class DataBaseHelperUser extends SQLiteOpenHelper {
      * @param username
      * @return
      */
-    public boolean addUsername(String username){
+    public boolean addUser(String username){
         //Create and/or open a database that will be used for reading and writing
         SQLiteDatabase db = this.getWritableDatabase();
         //ContentValues is used to store a set of values that the ContentResolver can process
@@ -59,9 +57,9 @@ public class DataBaseHelperUser extends SQLiteOpenHelper {
 
         //it contains the name of the column and the value the column for  this item is supposed to have
         contentValues.put(COL_NAME, username);
-        //contentValues.put(COL_SCORE, score);
+        contentValues.put(COL_SCORE, 0);
 
-        Log.d(TAG, "addData: Adding " + username + " to " + TABLE_NAME);
+        Log.d(TAG, "addData: Adding " + username + " with score " + 0 + " to " + TABLE_NAME);
 
         //insert the content of the contentValue into the table, the null is optional and used for:
         //SQL doesn't allow inserting a completely empty row without naming at least one column name.
@@ -83,17 +81,31 @@ public class DataBaseHelperUser extends SQLiteOpenHelper {
      * entry present in the database. Bacause of this we can retunr all the contents of the db
      * @return
      */
-    public Cursor getUsername(){
+    public Cursor getUser(){
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME;
         Cursor data = db.rawQuery(query, null);
         return data;
     }
 
+    /**
+     * sets the new username at the place of the old one
+     * @param oldUsername
+     * @param username
+     */
     public void updateUsername(String oldUsername, String username) {
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "UPDATE " + TABLE_NAME + " SET " + COL_NAME + " = '" + username +"' WHERE "
                 + COL_NAME + " = '" + oldUsername + "'";
+        Log.d(TAG, "updateName: query: " + query);
+        Log.d(TAG, "updateName: Setting to: " + true);
+        db.execSQL(query);
+    }
+
+    public void setScore(String username, int points) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "UPDATE " + TABLE_NAME + " SET " + COL_SCORE + " = '" + points + "' WHERE "
+                + COL_NAME + " = '" + username + "'";
         Log.d(TAG, "updateName: query: " + query);
         Log.d(TAG, "updateName: Setting to: " + true);
         db.execSQL(query);

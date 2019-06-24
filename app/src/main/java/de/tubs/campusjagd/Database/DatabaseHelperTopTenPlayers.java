@@ -7,27 +7,27 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import java.util.List;
+public class DatabaseHelperTopTenPlayers extends SQLiteOpenHelper {
 
-import de.tubs.campusjagd.model.Challenge;
-import de.tubs.campusjagd.model.Room;
+    private static final String TAG = "DatabaseHelperUser";
 
-public class DatabaseHelperChallenge extends SQLiteOpenHelper {
-
-    private static final String TAG = "DatabaseHelperRoom";
-
-    private static final String TABLE_NAME = "challenge_table";
+    private static final String TABLE_NAME = "top_ten_table";
     private static final String COL_NAME = "name";
-    private static final String COL_ROOMS = "rooms";
+    private static final String COL_SCORE = "score";
 
-    public DatabaseHelperChallenge(Context context) {
+    public DatabaseHelperTopTenPlayers(Context context) {
         super(context, TABLE_NAME, null, 1);
     }
 
+    /**
+     * Creating the table, to hold the data, by calling a query called createTable
+     *
+     * @param db
+     */
     @Override
     public void onCreate(SQLiteDatabase db) {
         String createTable = "CREATE TABLE " + TABLE_NAME + " ( " +
-                COL_NAME + " TEXT PRIMARY KEY," + COL_ROOMS + " TEXT )";
+                COL_NAME + " TEXT PRIMARY KEY, " + COL_SCORE + " INTEGER) ";
         db.execSQL(createTable);
     }
 
@@ -49,26 +49,20 @@ public class DatabaseHelperChallenge extends SQLiteOpenHelper {
      * Function to add data to the table, it returns a bool to indicate a
      * successful insertion of the data, or the fail of that operation
      *
-     * @param challenge
+     * @param username
      * @return
      */
-    public boolean addChallenge(Challenge challenge) {
+    public boolean addPlayer(String username, int score) {
         //Create and/or open a database that will be used for reading and writing
         SQLiteDatabase db = this.getWritableDatabase();
         //ContentValues is used to store a set of values that the ContentResolver can process
         ContentValues contentValues = new ContentValues();
 
         //it contains the name of the column and the value the column for  this item is supposed to have
-        contentValues.put(COL_NAME, challenge.getName());
-        List<Room> rooms = challenge.getRoomList();
-        String roomListAsString = "";
-        for (Room room : rooms) {
-            roomListAsString += room.getName() + ";";
-        }
-        contentValues.put(COL_ROOMS, roomListAsString);
+        contentValues.put(COL_NAME, username);
+        contentValues.put(COL_SCORE, score);
 
-        Log.d(TAG, "addData: Adding " + challenge.getName() + ", " + roomListAsString +
-                " to " + TABLE_NAME);
+        Log.d(TAG, "addData: Adding " + username + " to " + TABLE_NAME);
 
         //insert the content of the contentValue into the table, the null is optional and used for:
         //SQL doesn't allow inserting a completely empty row without naming at least one column name.
@@ -85,44 +79,17 @@ public class DatabaseHelperChallenge extends SQLiteOpenHelper {
     }
 
     /**
-     * get a specific challenge for which only the name is known
+     * sets the new username at the place of the old one
      *
-     * @param challengeName
-     * @return
+     * @param username
+     * @param score
      */
-    public Cursor getSpecificChallenge(String challengeName) {
+    public void updatePlayer(String username, int score) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COL_NAME + " = '" + challengeName + "'";
-        Cursor data = db.rawQuery(query, null);
-        return data;
-    }
-
-    /**
-     * All entries of the table are returned
-     *
-     * @return
-     */
-    public Cursor getAllChallenges() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME;
-        Cursor data = db.rawQuery(query, null);
-        return data;
-    }
-
-    /**
-     * updates an entry of the database where the ids match
-     *
-     * @param challenge
-     */
-    public void updateChallenge(Challenge challenge) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        List<Room> rooms = challenge.getRoomList();
-        String roomListAsString = "";
-        for (Room room : rooms) {
-            roomListAsString += room.getName() + ";";
-        }
-        String query = "UPDATE " + TABLE_NAME + " SET " + COL_ROOMS + " = '" + roomListAsString + "' WHERE " + COL_NAME + " = '" + challenge.getName() + "'";
-        Log.d(TAG, "deleteName: query: " + query);
+        String query = "UPDATE " + TABLE_NAME + " SET " + COL_SCORE + " = '" + score + "' WHERE "
+                + COL_NAME + " = '" + username + "'";
+        Log.d(TAG, "updateName: query: " + query);
+        Log.d(TAG, "updateName: Setting to: " + true);
         db.execSQL(query);
     }
 
@@ -131,11 +98,23 @@ public class DatabaseHelperChallenge extends SQLiteOpenHelper {
      *
      * @param name
      */
-    public void deleteChallenge(String name) {
+    public void deletePlayer(String name) {
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "DELETE FROM " + TABLE_NAME + " WHERE " + COL_NAME + " = '" + name + "'";
         Log.d(TAG, "deleteName: query: " + query);
-        Log.d(TAG, "deleteName: deleting: " + name);
+        Log.d(TAG, "deleteName: updating: " + name);
         db.execSQL(query);
+    }
+
+    /**
+     * gets all the data from the database
+     *
+     * @return
+     */
+    public Cursor getTopTenPlayers() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME;
+        Cursor data = db.rawQuery(query, null);
+        return data;
     }
 }
