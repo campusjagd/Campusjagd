@@ -7,15 +7,15 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-public class DatabaseHelperTopTenPlayers extends SQLiteOpenHelper {
+public class DatabaseHelperPlayers extends SQLiteOpenHelper {
 
-    private static final String TAG = "DatabaseHelperUser";
+    private static final String TAG = "DatabaseHelperPlayers";
 
     private static final String TABLE_NAME = "top_ten_table";
     private static final String COL_NAME = "name";
     private static final String COL_SCORE = "score";
 
-    public DatabaseHelperTopTenPlayers(Context context) {
+    public DatabaseHelperPlayers(Context context) {
         super(context, TABLE_NAME, null, 1);
     }
 

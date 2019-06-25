@@ -14,7 +14,7 @@ import de.tubs.campusjagd.model.Room;
 
 public class DatabaseHelperChallenge extends SQLiteOpenHelper {
 
-    private static final String TAG = "DatabaseHelperRoom";
+    private static final String TAG = "DatabaseHelperChallenge";
 
     private static final String TABLE_NAME = "challenge_table";
     private static final String COL_NAME = "name";

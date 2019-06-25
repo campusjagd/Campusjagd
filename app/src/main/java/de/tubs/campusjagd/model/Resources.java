@@ -28,9 +28,10 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
 import de.tubs.campusjagd.Database.DataBaseHelperUser;
+import de.tubs.campusjagd.Database.DatabaseHelperAllChallengeNames;
 import de.tubs.campusjagd.Database.DatabaseHelperChallenge;
 import de.tubs.campusjagd.Database.DatabaseHelperRoom;
-import de.tubs.campusjagd.Database.DatabaseHelperTopTenPlayers;
+import de.tubs.campusjagd.Database.DatabaseHelperPlayers;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -45,7 +46,8 @@ public class Resources {
     private static DatabaseHelperRoom mDatabaseHelperRoom;
     private static DatabaseHelperChallenge mDatabaseHelperChallenge;
     private static DataBaseHelperUser mDatabaseHelperUser;
-    private static DatabaseHelperTopTenPlayers mDatabaseHelperTopTenPlayers;
+    private static DatabaseHelperPlayers mDatabaseHelperPlayers;
+    private static DatabaseHelperAllChallengeNames mDatabaseHelperAllChallengeNames;
     private OkHttpClient okHttpClient;
 
     private final String hostnameServer = "https://134.169.47.155";
@@ -81,9 +83,19 @@ public class Resources {
         mDatabaseHelperRoom = new DatabaseHelperRoom(context);
         mDatabaseHelperChallenge = new DatabaseHelperChallenge(context);
         mDatabaseHelperUser = new DataBaseHelperUser(context);
-        mDatabaseHelperTopTenPlayers = new DatabaseHelperTopTenPlayers(context);
+        mDatabaseHelperPlayers = new DatabaseHelperPlayers(context);
+        mDatabaseHelperAllChallengeNames = new DatabaseHelperAllChallengeNames(context);
 
         mDatabaseHelperUser.addUser("Test");
+
+        //calling the server to get all players added to the db
+        //should be made at the start of the app to ensure the current top players are correct
+        //furthermore necessary for check if username is available
+        getAllPlayersServer();
+
+        //calling the server to get all challenges added to the db
+        //should be made at the start of the app to enable check, if challenge name is possible
+        getAndSaveAllChallengeNamesServer();
 
         Room room1 = new Room(null, new GPS(52.272899, 10.525311), "Raum 161", 2, Calendar.getInstance().getTime().toString(), true);
         Room room3 = new Room(null, new GPS(), "Raum 74", 10, Calendar.getInstance().getTime().toString(), false);
@@ -101,13 +113,6 @@ public class Resources {
         addRoom(room5);
         addRoom(room6);
         //addRoom(room7);
-
-        final String TABLE_NAME = "room_table";
-        final String COL_NAME = "name";
-        final String COL_GPS = "gps";
-        final String COL_POINTS = "points";
-        final String COL_TIMESTAMP = "timestamp";
-        final String COL_ROOMFOUND = "roomFound";
 
         ArrayList<Room> roomlist1 = new ArrayList<>();
         roomlist1.add(room1);
@@ -139,7 +144,7 @@ public class Resources {
      * setups the client to use the server.pem or the server.cer as a trustanchor for connecting to
      * the server. Furthermore because the host is unverified the hostname is whitelistet to allow access
      *
-     * @param context
+     * @param context of this class
      */
     private void setupClient(Context context) {
         SSLContext sslContext;
@@ -171,10 +176,7 @@ public class Resources {
         builder.hostnameVerifier(new HostnameVerifier() {
             @Override
             public boolean verify(String hostname, SSLSession session) {
-                if (hostname.equals(hostnameServerSetup)) {
-                    return true;
-                }
-                return false;
+                return hostname.equals(hostnameServerSetup);
             }
         });
         okHttpClient = builder.build();
@@ -187,17 +189,23 @@ public class Resources {
     /**
      * adds challenge locally and on the server
      *
-     * @param challenge
+     * @param challenge to be added to the db
      */
     public void addChallenge(Challenge challenge) {
+        //adding the challenge to the database
+        //if there is already a challenge by that name in the DB this will fail without a serious error
         mDatabaseHelperChallenge.addChallenge(challenge);
+        //if the challenge already exists the update function is called to set the correct values
+        //for that challenge
+        updateChallenge(challenge);
+        //adding challenge to the server
         addChallengeServer(challenge);
     }
 
     /**
      * adds challenge locally
      *
-     * @param challenge
+     * @param challenge to be added to the db
      */
     public void saveChallenge(Challenge challenge) {
         addChallenge(challenge);
@@ -206,16 +214,16 @@ public class Resources {
     /**
      * updates a challenge that is already on the device
      *
-     * @param challenge
+     * @param challenge to be updated to the db
      */
-    public void updateChallenge(Challenge challenge) {
+    private void updateChallenge(Challenge challenge) {
         mDatabaseHelperChallenge.updateChallenge(challenge);
     }
 
     /**
      * gets all the challenges stored locally on the device
      *
-     * @return
+     * @return List of all the challenges currently stored on the device
      */
     public List<Challenge> getAllChallenges() {
         List<Challenge> challengeList = new ArrayList<>();
@@ -245,17 +253,17 @@ public class Resources {
     /**
      * gets specific challenge stored locally on the device
      *
-     * @param challengeName
-     * @return
+     * @param challengeName to be retrieved from the db
+     * @return Cursor containing all the information of the challenge
      */
     public Cursor getSpecificChallenge(String challengeName) {
-        return mDatabaseHelperRoom.getSpecificRoom(challengeName);
+        return mDatabaseHelperChallenge.getSpecificChallenge(challengeName);
     }
 
     /**
      * deletes a challenge
      *
-     * @param challenge
+     * @param challenge to be deleted from the db
      */
     public void deleteChallenge(Challenge challenge) {
         mDatabaseHelperChallenge.deleteChallenge(challenge.getName());
@@ -264,11 +272,45 @@ public class Resources {
     /**
      * deletes a challenge
      *
-     * @param challengeName
+     * @param challengeName name of the challenge that is to be deleted
      */
     public void deleteChallenge(String challengeName) {
         mDatabaseHelperChallenge.deleteChallenge(challengeName);
     }
+
+    /**
+     * checks whether a name is already assigned to another challenge
+     * @param challengeName the name to check if it is still available
+     * @return true, when the name is still free
+     */
+    public boolean checkIfChallengeNameAvailable(String challengeName){
+        Cursor data = getAllChallengeNames();
+
+        List<String> challegneNamesOfAllChallenges = new ArrayList<>();
+
+        while (data.moveToNext()){
+            challegneNamesOfAllChallenges.add(data.getString(0));
+        }
+
+        return !challegneNamesOfAllChallenges.contains(challengeName);
+    }
+
+    /**
+     * adding the names of all challenges from the server to the db
+     * @param challengeName name to be added
+     */
+    private void addToAllChallengeNames(String challengeName) {
+        mDatabaseHelperAllChallengeNames.addChallenge(challengeName);
+    }
+
+    /**
+     * returning all the names of all the challenges known
+     * @return cursor with data
+     */
+    private Cursor getAllChallengeNames() {
+        return mDatabaseHelperAllChallengeNames.getAllChallenges();
+    }
+
 
     //=============================================================================================
     //Room Methods
@@ -276,18 +318,19 @@ public class Resources {
     /**
      * adds a room locally and on the server
      *
-     * @param room
+     * @param room to be added to the db
      */
     public void addRoom(Room room) {
         sanitizeRoomName(room);
         mDatabaseHelperRoom.addRoom(room);
+        updateRoom(room);
         addRoomServer(room);
     }
 
     /**
      * adds room locally
      *
-     * @param room
+     * @param room to be added to the db
      */
     public void saveRoom(Room room) {
         addRoom(room);
@@ -296,7 +339,7 @@ public class Resources {
     /**
      * makes all letters in the room name uppercase and removes spaces
      *
-     * @param room
+     * @param room of which the name has to be cleaned
      */
     private void sanitizeRoomName(Room room) {
         String roomName = room.getName();
@@ -308,16 +351,16 @@ public class Resources {
     /**
      * updates a room that is already saved on the device
      *
-     * @param room
+     * @param room to be updated in the db
      */
-    public void updateRoom(Room room) {
+    private void updateRoom(Room room) {
         mDatabaseHelperRoom.updateRoom(room);
     }
 
     /**
      * gets all rooms stored locally on the device
      *
-     * @return
+     * @return List of all rooms in the db
      */
     public List<Room> getAllRooms() {
         Cursor data = mDatabaseHelperRoom.getAllRooms();
@@ -329,8 +372,8 @@ public class Resources {
     /**
      * gets specific room stored locally on the device
      *
-     * @param roomName
-     * @return
+     * @param roomName name of the room to get
+     * @return cursor with all information on the room
      */
     public Cursor getSpecificRoom(String roomName) {
         return mDatabaseHelperRoom.getSpecificRoom(roomName);
@@ -339,7 +382,7 @@ public class Resources {
     /**
      * deletes a room
      *
-     * @param room
+     * @param room to be deleted from the db
      */
     public void deleteRoom(Room room) {
         mDatabaseHelperRoom.deleteRoom(room.getName());
@@ -348,7 +391,7 @@ public class Resources {
     /**
      * deletes a room
      *
-     * @param roomName
+     * @param roomName name of the room to be deleted from the db
      */
     public void deleteRoom(String roomName) {
         mDatabaseHelperRoom.deleteRoom(roomName);
@@ -381,8 +424,8 @@ public class Resources {
     /**
      * instantiates a list of rooms to use in instantiating an object of the type challenge
      *
-     * @param data
-     * @return
+     * @param data with information on rooms
+     * @return list of rooms
      */
     private List<Room> instantiateRoomList(Cursor data) {
 
@@ -397,11 +440,7 @@ public class Resources {
             int points = data.getInt(2);
             String timestamp = data.getString(3);
             boolean roomFound;
-            if (data.getString(4).equals("true")) {
-                roomFound = true;
-            } else {
-                roomFound = false;
-            }
+            roomFound = data.getString(4).equals("true");
 
             Room room = new Room(null, gps, name, points, timestamp, roomFound);
             roomList.add(room);
@@ -413,7 +452,7 @@ public class Resources {
      * when a barcode is read the contents of the barcode are copmared to the rooms the devoie
      * knows of, if there is a match a room is marked as found
      *
-     * @param barcodeValue
+     * @param barcodeValue string encapsulated in the qr-code
      */
     public void handleBarcodeRead(String barcodeValue) {
         //barcode looks like:     name;long;lat;points;timestamp;
@@ -441,7 +480,7 @@ public class Resources {
     /**
      * sets the room found to true
      *
-     * @param room
+     * @param room room that was found
      */
     public void handleRoomFound(Room room) {
         //when a room is found the variable found is set to true in the db
@@ -454,7 +493,7 @@ public class Resources {
     /**
      * gets username from the local user
      *
-     * @return
+     * @return the username of this device
      */
     public String getUserName() {
         Cursor data = mDatabaseHelperUser.getUser();
@@ -469,11 +508,11 @@ public class Resources {
     /**
      * checks whether the new chosen username is already taken by another player or not
      *
-     * @param newUsername
-     * @return
+     * @param newUsername the new username
+     * @return true if the new username is not already taken
      */
     public boolean isUsernamePossible(String newUsername) {
-        List<Player> players = getAllPlayersServer();
+        List<Player> players = getAllPlayersLocally();
         //if there is a player registered on the server then the new name is not possible to set, because
         //it is already taken
         for (Player player: players){
@@ -487,7 +526,7 @@ public class Resources {
     /**
      * updates the username on the device and on the server
      *
-     * @param username
+     * @param username new username
      */
     public void updateUsername(String username) {
         Cursor data = mDatabaseHelperUser.getUser();
@@ -505,7 +544,7 @@ public class Resources {
 
     /**
      * sets the user score in the local db
-     * @param points
+     * @param points points of the player
      */
     public void setUserScore(int points) {
         mDatabaseHelperUser.setScore(getUserName(), points);
@@ -513,7 +552,7 @@ public class Resources {
 
     /**
      * gets the score of the user from the local db
-     * @return
+     * @return the current points the player has
      */
     public int getUserScore() {
         Cursor data = mDatabaseHelperUser.getUser();
@@ -531,40 +570,39 @@ public class Resources {
     /**
      * asdd player to the database
      *
-     * @param player
+     * @param player to be added to the db
      */
-    private void addTopTenPlayer(Player player) {
-        mDatabaseHelperTopTenPlayers.addPlayer(player.getName(), player.getPoints());
+    private void addPlayer(Player player) {
+        mDatabaseHelperPlayers.addPlayer(player.getName(), player.getPoints());
     }
 
     /**
      * updates a players score
      *
-     * @param player
+     * @param player to be updated in the db
      */
-    private void updateTopTenPlayer(Player player) {
-        mDatabaseHelperTopTenPlayers.updatePlayer(player.getName(), player.getPoints());
+    private void updatePlayer(Player player) {
+        mDatabaseHelperPlayers.updatePlayer(player.getName(), player.getPoints());
     }
 
     /**
      * deletes a player
      *
-     * @param player
+     * @param player to be deleted from the db
      */
-    private void deleteTopTenPlayer(Player player) {
-        mDatabaseHelperTopTenPlayers.deletePlayer(player.getName());
+    private void deletePlayer(Player player) {
+        mDatabaseHelperPlayers.deletePlayer(player.getName());
     }
 
     /**
-     * gets the top ten players in the database
-     *
-     * @return
+     * gets all the players there are
+     * @return list of players
      */
-    public List<Player> getTopTenPlayersLocally() {
+    private List<Player> getAllPlayersLocally() {
 
         List<Player> players = new ArrayList<>();
 
-        Cursor data = mDatabaseHelperTopTenPlayers.getTopTenPlayers();
+        Cursor data = mDatabaseHelperPlayers.getTopTenPlayers();
 
         while (data.moveToNext()) {
             String name = data.getString(0);
@@ -573,124 +611,11 @@ public class Resources {
             players.add(player);
         }
 
-        //sort the list of players in descending order
-        Collections.sort(players, new Comparator<Player>() {
-            @Override
-            public int compare(Player p1, Player p2) {
-                if (p1.getPoints() < p2.getPoints())
-                    return 1;
-                if (p1.getPoints() > p2.getPoints())
-                    return -1;
-                return 0;
-            }
-        });
-
-        List<Player> topTenPlayers = new ArrayList<>();
-
-        //add the top 10 players by points to the list
-        for (int i = 0; i < players.size(); i++) {
-            if (i < 10) {
-                topTenPlayers.add(players.get(i));
-            } else {
-                break;
-            }
-        }
-
-        return topTenPlayers;
+        return players;
     }
 
     //=============================================================================================
-    //Server Methods
-
-    /**
-     * gets all rooms from the server and saves them to the device
-     *
-     * @param roomName
-     */
-    public void getAndSaveAllRoomsServer(String roomName) {
-        //building the url to call
-        String url = hostnameServer + room_url;
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-
-        //making the request as a callback to not invoke a NetworkOnMainThreadException
-        //the rooms will be saved to the database to be accessed from there
-        //this is due to the asynchronous nature of the request
-        //if one wants to get the new rooms the "getAllRooms" Method has to be called
-        okHttpClient.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String jsonResponse = response.body().string();
-                    try {
-                        //parsing the json, that is contained in the response
-                        JSONObject jsonObject = new JSONObject(jsonResponse);
-                        JSONArray rooms = jsonObject.getJSONArray("rooms");
-                        //the method "roomListFromJson" is responsible for adding and updating the new rooms
-                        roomListFromJson(rooms);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-    }
-
-    /**
-     * gets a specific room from the server and saves it to the device
-     *
-     * @param roomName
-     */
-    public void getAndSaveSpecificRoomServer(String roomName) {
-        //building the url to call
-        String url = hostnameServer + specific_get_room_url + roomName;
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-
-        //making the request as a callback to not invoke a NetworkOnMainThreadException
-        //the rooms will be saved to the database to be accessed from there
-        //this is due to the asynchronous nature of the request
-        //if one wants to get the new rooms the "getAllRooms" Method has to be called
-        okHttpClient.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String jsonResponse = response.body().string();
-                    try {
-                        //parsing the json, that is contained in the response
-                        JSONObject jsonObject = new JSONObject(jsonResponse);
-                        String[] gpsPostion = jsonObject.getString("gpsposition").split(",");
-                        double lat = Double.parseDouble(gpsPostion[0]);
-                        double longi = Double.parseDouble(gpsPostion[1]);
-                        String name = jsonObject.getString("name");
-                        String points = jsonObject.getString("points");
-                        String timestamp = jsonObject.getString("timestamp");
-                        Room room = new Room(null, new GPS(lat, longi), name, Integer.parseInt(points), timestamp, false);
-                        //adding the room to the database
-                        //if there is already a room by that name in the DB  this will fail without a serious error
-                        addRoom(room);
-                        //if the room already exists the update function is called to set the correct values
-                        //for that room (the values from the server are assumed to be always correct)
-                        updateRoom(room);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-    }
+    //Server Methods Challenge
 
     /**
      * gets all challenges from the server and saves them to the device
@@ -726,12 +651,53 @@ public class Resources {
                             JSONArray rooms = mJsonObjectProperty.getJSONArray("rooms");
                             List<Room> roomListServer = roomListFromJson(rooms);
                             Challenge challenge = new Challenge(challengeName, roomListServer);
-                            //adding the challenge to the database
+                            //adding the challenge to the database while simultaneously updating it
+                            //in case it already exists
                             //if there is already a challenge by that name in the DB this will fail without a serious error
                             addChallenge(challenge);
-                            //if the challenge already exists the update function is called to set the correct values
-                            //for that challenge (the values from the server are assumed to be always correct)
-                            updateChallenge(challenge);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * gets all challenge names from the server and saves them to the device
+     */
+    private void getAndSaveAllChallengeNamesServer() {
+        //building the url to call
+        String url = hostnameServer + challenge_url;
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        //making the request as a callback to not invoke a NetworkOnMainThreadException
+        //the challenges will be saved to the database to be accessed from there
+        //this is due to the asynchronous nature of the request
+        //if one wants to get the new challenges the "getAllChallenges" Method has to be called
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String jsonResponse = response.body().string();
+                    try {
+                        //parsing the json, that is contained in the response
+                        JSONObject jsonObject = new JSONObject(jsonResponse);
+                        JSONArray challenges = jsonObject.getJSONArray("get_challenges");
+                        for (int i = 0; i < challenges.length(); i++) {
+                            JSONObject mJsonObjectProperty = challenges.getJSONObject(i);
+                            String challengeName = mJsonObjectProperty.getString("name");
+                            //adding the challenge name to the database
+                            //if there is already a challenge by that name in the DB this will fail without a serious error
+                            addToAllChallengeNames(challengeName);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -744,7 +710,7 @@ public class Resources {
     /**
      * gets a specific challenges from the server and saves it to the device
      *
-     * @param challengeName
+     * @param challengeName to be retrieved from the server an saved to the db
      */
     public void getAndSaveSpecificChallengeServer(final String challengeName) {
         //building the url to call
@@ -774,12 +740,10 @@ public class Resources {
                         JSONArray rooms = jsonObject.getJSONArray("rooms");
                         List<Room> roomListServer = roomListFromJson(rooms);
                         Challenge challenge = new Challenge(name, roomListServer);
-                        //adding the challenge to the database
+                        //adding the challenge to the database while simultaneously updating it
+                        //in case it already exists
                         //if there is already a challenge by that name in the DB this will fail without a serious error
                         addChallenge(challenge);
-                        //if the challenge already exists the update function is called to set the correct values
-                        //for that challenge (the values from the server are assumed to be always correct)
-                        updateChallenge(challenge);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -789,68 +753,12 @@ public class Resources {
     }
 
     /**
-     * iterates over a json array and instantiates all the rooms
-     * returns a list of rooms to use in instantiating a challenge object
-     *
-     * @param rooms
-     * @return
-     * @throws JSONException
-     */
-    private List<Room> roomListFromJson(JSONArray rooms) throws JSONException {
-        List<Room> roomListServer = new ArrayList<>();
-        for (int i = 0; i < rooms.length(); i++) {
-            //parsing the rooms contained in the json array
-            JSONObject mJsonObjectProperty = rooms.getJSONObject(i);
-
-            String[] gpsPostion = mJsonObjectProperty.getString("gpsposition").split(",");
-            double lat = Double.parseDouble(gpsPostion[0]);
-            double longi = Double.parseDouble(gpsPostion[1]);
-
-            String roomName = mJsonObjectProperty.getString("name");
-
-            String points = mJsonObjectProperty.getString("points");
-
-            String timestamp = mJsonObjectProperty.getString("timestamp");
-
-            boolean found = false;
-            //if room is not already known add it with not-found-flag
-            Cursor roomData = getSpecificRoom(roomName);
-            //the cursor will always contain a name column, but if the room is already known the cursor
-            //should contain 5 columns
-            if (roomData.getCount() > 1) {
-                while (roomData.moveToNext()) {
-                    //the receiver could already know of a room, which is contained in the response from
-                    //the server, if that's the case the correspondy foundFlag will be set
-                    if (roomData.getString(4).equals("true")) {
-                        found = true;
-                    } else {
-                        found = false;
-                    }
-                }
-            } else {
-                //if the receiver doesn't know of the room the found variable will be set to false
-                found = false;
-
-            }
-            Room room = new Room(null, new GPS(lat, longi), roomName, Integer.parseInt(points), timestamp, found);
-            //adding the room to the database
-            //if there is already a room by that name in the DB  this will fail without a serious error
-            addRoom(room);
-            //if the room already exists the update function is called to set the correct values
-            //for that room (the values from the server are assumed to be always correct)
-            updateRoom(room);
-            roomListServer.add(room);
-        }
-        return roomListServer;
-    }
-
-    /**
      * adds a challenge to the server, if the challenge already exists there is a response
      * with "Bad Request", that wont crash the app
      *
-     * @param challenge
+     * @param challenge to be added to the server
      */
-    public void addChallengeServer(Challenge challenge) {
+    private void addChallengeServer(Challenge challenge) {
 
         //building the url to call
         String url = hostnameServer + post_challenge_url;
@@ -899,13 +807,157 @@ public class Resources {
         });
     }
 
+    //=============================================================================================
+    //Server Methods Room
+
+    /**
+     * gets all rooms from the server and saves them to the device
+     *
+     */
+    public void getAndSaveAllRoomsServer() {
+        //building the url to call
+        String url = hostnameServer + room_url;
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        //making the request as a callback to not invoke a NetworkOnMainThreadException
+        //the rooms will be saved to the database to be accessed from there
+        //this is due to the asynchronous nature of the request
+        //if one wants to get the new rooms the "getAllRooms" Method has to be called
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String jsonResponse = response.body().string();
+                    try {
+                        //parsing the json, that is contained in the response
+                        JSONObject jsonObject = new JSONObject(jsonResponse);
+                        JSONArray rooms = jsonObject.getJSONArray("rooms");
+                        //the method "roomListFromJson" is responsible for adding and updating the new rooms
+                        roomListFromJson(rooms);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * gets a specific room from the server and saves it to the device
+     *
+     * @param roomName to be retrieved from the server an saved to the db
+     */
+    public void getAndSaveSpecificRoomServer(String roomName) {
+        //building the url to call
+        String url = hostnameServer + specific_get_room_url + roomName;
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        //making the request as a callback to not invoke a NetworkOnMainThreadException
+        //the rooms will be saved to the database to be accessed from there
+        //this is due to the asynchronous nature of the request
+        //if one wants to get the new rooms the "getAllRooms" Method has to be called
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String jsonResponse = response.body().string();
+                    try {
+                        //parsing the json, that is contained in the response
+                        JSONObject jsonObject = new JSONObject(jsonResponse);
+                        String[] gpsPostion = jsonObject.getString("gpsposition").split(",");
+                        double lat = Double.parseDouble(gpsPostion[0]);
+                        double longi = Double.parseDouble(gpsPostion[1]);
+                        String name = jsonObject.getString("name");
+                        String points = jsonObject.getString("points");
+                        String timestamp = jsonObject.getString("timestamp");
+                        Room room = new Room(null, new GPS(lat, longi), name, Integer.parseInt(points), timestamp, false);
+                        //adding the room to the database while simultaneously updating it
+                        //in case it already exists
+                        //if there is already a room by that name in the DB this will fail without a serious error
+                        addRoom(room);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * iterates over a json array and instantiates all the rooms
+     * returns a list of rooms to use in instantiating a challenge object
+     *
+     * @param rooms json array containing information on rooms
+     * @return list of rooms
+     * @throws JSONException when the json is not readable
+     */
+    private List<Room> roomListFromJson(JSONArray rooms) throws JSONException {
+        List<Room> roomListServer = new ArrayList<>();
+        for (int i = 0; i < rooms.length(); i++) {
+            //parsing the rooms contained in the json array
+            JSONObject mJsonObjectProperty = rooms.getJSONObject(i);
+
+            String[] gpsPostion = mJsonObjectProperty.getString("gpsposition").split(",");
+            double lat = Double.parseDouble(gpsPostion[0]);
+            double longi = Double.parseDouble(gpsPostion[1]);
+
+            String roomName = mJsonObjectProperty.getString("name");
+
+            String points = mJsonObjectProperty.getString("points");
+
+            String timestamp = mJsonObjectProperty.getString("timestamp");
+
+            boolean found = false;
+            //if room is not already known add it with not-found-flag
+            Cursor roomData = getSpecificRoom(roomName);
+            //the cursor will always contain a name column, but if the room is already known the cursor
+            //should contain 5 columns
+            if (roomData.getCount() > 1) {
+                while (roomData.moveToNext()) {
+                    //the receiver could already know of a room, which is contained in the response from
+                    //the server, if that's the case the correspondy foundFlag will be set
+                    if (roomData.getString(4).equals("true")) {
+                        found = true;
+                    } else {
+                        found = false;
+                    }
+                }
+            } else {
+                //if the receiver doesn't know of the room the found variable will be set to false
+                found = false;
+
+            }
+            Room room = new Room(null, new GPS(lat, longi), roomName, Integer.parseInt(points), timestamp, found);
+            //adding the room to the database while simultaneously updating it
+            //in case it already exists
+            //if there is already a room by that name in the DB this will fail without a serious error
+            addRoom(room);
+            roomListServer.add(room);
+        }
+        return roomListServer;
+    }
+
     /**
      * adds a room to the server, if the room already exists there is a response
      * with "Bad Request", that wont crash the app
      *
-     * @param room
+     * @param room to be added to the server
      */
-    public void addRoomServer(Room room) {
+    private void addRoomServer(Room room) {
         //building the url to call
         String url = hostnameServer + post_room_url;
 
@@ -946,10 +998,13 @@ public class Resources {
         });
     }
 
+    //=============================================================================================
+    //Server Methods Player
+
     /**
      * posting the own score to the server
-     * @param username
-     * @param score
+     * @param username to be added to the server
+     * @param score to be added to the server
      */
     public void postUser(String username, int score){
         //building the url to call
@@ -991,8 +1046,8 @@ public class Resources {
 
     /**
      * updating the username on the server to set to the new one
-     * @param oldUsername
-     * @param newUsername
+     * @param oldUsername to be replaced on the server
+     * @param newUsername to be updated on the server
      */
     private void putNewUsernameServer(String oldUsername, String newUsername, int score) {
         //building the url to call
@@ -1034,12 +1089,9 @@ public class Resources {
     }
 
     /**
-     * gets all the players listed on the server
-     *
-     * @return
+     * adds all the players listed on the server to the db
      */
-    private List<Player> getAllPlayersServer() {
-        final List<Player> playerList = new ArrayList<>();
+    private void getAllPlayersServer(){
 
         //building the url to call for the get
         String url = hostnameServer + user_url;
@@ -1069,7 +1121,9 @@ public class Resources {
                             String points = mJsonObjectProperty.getString("points");
 
                             Player player = new Player(name, Integer.parseInt(points));
-                            playerList.add(player);
+                            Log.d("GETPLAYERS", player.getName()+" "+player.getPoints());
+                            addPlayer(player);
+                            updatePlayer(player);
                         }
 
                     } catch (JSONException e) {
@@ -1078,20 +1132,31 @@ public class Resources {
                 }
             }
         });
-
-        return playerList;
-
     }
 
     /**
      * returns the top ten players sorted in descending order
      *
-     * @return
+     * @return list of players
      */
-    public List<Player> getTopTenPlayersServer() {
+    public List<Player> getTopTenPlayers() {
 
-        //get all the players from the server
-        List<Player> players = getAllPlayersServer();
+//        //adding all players to the db
+//        getAllPlayersServer();
+
+//        //wait for response
+//        //give the "getAllPlayersServer" the chance to add all the players to the database before accessing it
+//        //mainly relevant when first starting the app, might cann be deleted, if the call is made
+//        //for example in the constructor of this class and the access to the db happens some time later
+//        //in the future
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+
+        //get all the players
+        List<Player>  players =  getAllPlayersLocally();
 
         //sort the list of players in descending order
         Collections.sort(players, new Comparator<Player>() {
@@ -1111,17 +1176,10 @@ public class Resources {
         for (int i = 0; i < players.size(); i++) {
             if (i < 10) {
                 playersTopTen.add(players.get(i));
-                //adding the player to the database
-                //if there is already a player by that name in the DB this will fail without a serious error
-                addTopTenPlayer(players.get(i));
-                //if the player already exists the update function is called to set the correct values
-                //for that player (the values from the server are assumed to be always correct)
-                updateTopTenPlayer(players.get(i));
             } else {
                 break;
             }
         }
-
         return playersTopTen;
     }
 }
