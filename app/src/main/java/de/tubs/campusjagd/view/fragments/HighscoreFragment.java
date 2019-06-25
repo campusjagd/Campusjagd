@@ -1,25 +1,35 @@
 package de.tubs.campusjagd.view.fragments;
 
 import android.annotation.SuppressLint;
+import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.etc.Logger;
+import de.tubs.campusjagd.model.Player;
 import de.tubs.campusjagd.model.Resources;
 import de.tubs.campusjagd.model.Room;
+import de.tubs.campusjagd.view.adapter.HighscoreAdapter;
 
 public class HighscoreFragment extends Fragment {
 
     TextView mOwnNameTextView;
     TextView mOwnPointsTextView;
+    RecyclerView mHighscoreRecyclerView;
+    HighscoreAdapter mHighscoreAdapter;
 
     @Nullable
     @Override
@@ -49,6 +59,23 @@ public class HighscoreFragment extends Fragment {
         resources.setUserScore(points);
         mOwnPointsTextView.setText(Integer.toString(points));
 
+
+        // Start adapter
+        mHighscoreRecyclerView = view.findViewById(R.id.highscore_all_points);
+        mHighscoreRecyclerView.setHasFixedSize(true);
+        LinearLayoutManager llm = new LinearLayoutManager(view.getContext());
+        mHighscoreRecyclerView.setLayoutManager(llm);
+
+        List<Player> highscorePlayer = new ArrayList<>();
+        try{
+            highscorePlayer = Resources.getInstance(view.getContext()).getTopTenPlayers();
+        } catch (SQLiteException exception) {
+            Logger.LogExeption(HighscoreFragment.class.getSimpleName(), "Unable to initialize playerlist", exception);
+        }
+
+        mHighscoreAdapter = new HighscoreAdapter(highscorePlayer);
+        mHighscoreRecyclerView.setAdapter(mHighscoreAdapter);
+
     }
 
     @Override
@@ -61,6 +88,14 @@ public class HighscoreFragment extends Fragment {
 
         } catch (NullPointerException e) {
             Logger.LogExeption(CreateNewRoomFragment.class.getSimpleName(), "Unable to set toolbar", e);
+        }
+
+        // Refresh the playerlist
+        try {
+            mHighscoreAdapter.updatePlayerList(Resources.getInstance(this.getContext()).getTopTenPlayers());
+
+        } catch (SQLiteException exception) {
+            Logger.LogExeption(HighscoreFragment.class.getSimpleName(), "Unable to update playerlist", exception);
         }
     }
 }
