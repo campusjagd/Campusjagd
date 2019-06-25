@@ -860,8 +860,11 @@ public class Resources {
             json.put("name", challenge.getName());
             String rooms = "";
             List<Room> roomsList = challenge.getRoomList();
+            //making a string consisting of the names of the rooms the challenge is made up of
             for (int i = 0; i < roomsList.size(); i++) {
                 rooms += roomsList.get(i).getName();
+                //adding the rooms of the challenge to the server, just in case
+                addRoomServer(roomsList.get(i));
                 if (i < roomsList.size() - 1) {
                     rooms += ",";
                 }
