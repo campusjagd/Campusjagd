@@ -3,10 +3,12 @@ package de.tubs.campusjagd.Database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import de.tubs.campusjagd.BuildConfig;
 import de.tubs.campusjagd.model.Room;
 
 public class DatabaseHelperRoom extends SQLiteOpenHelper {
@@ -20,12 +22,13 @@ public class DatabaseHelperRoom extends SQLiteOpenHelper {
     private static final String COL_TIMESTAMP = "timestamp";
     private static final String COL_ROOMFOUND = "roomFound";
 
-    public DatabaseHelperRoom(Context context){
+    public DatabaseHelperRoom(Context context) {
         super(context, TABLE_NAME, null, 1);
     }
 
     /**
      * Creating the table, to hold the data, by calling a query called createTable
+     *
      * @param db
      */
     @Override
@@ -39,6 +42,7 @@ public class DatabaseHelperRoom extends SQLiteOpenHelper {
     /**
      * Only called if the table needs to be upgraded
      * Here the complete Table will be discarded and the system starts over
+     *
      * @param db
      * @param oldVersion
      * @param newVersion
@@ -52,10 +56,11 @@ public class DatabaseHelperRoom extends SQLiteOpenHelper {
     /**
      * Function to add data to the table, it returns a bool to indicate a
      * successful insertion of the data, or the fail of that operation
+     *
      * @param room
      * @return
      */
-    public boolean addRoom(Room room){
+    public boolean addRoom(Room room) {
         //Create and/or open a database that will be used for reading and writing
         SQLiteDatabase db = this.getWritableDatabase();
         //ContentValues is used to store a set of values that the ContentResolver can process
@@ -67,27 +72,33 @@ public class DatabaseHelperRoom extends SQLiteOpenHelper {
         contentValues.put(COL_GPS, room.getGps().toString());
         contentValues.put(COL_POINTS, room.getPoints());
         contentValues.put(COL_TIMESTAMP, room.getTimestamp());
-        if (room.isRoomFound()){
+        if (room.isRoomFound()) {
             contentValues.put(COL_ROOMFOUND, "true");
-        }else{
+        } else {
             contentValues.put(COL_ROOMFOUND, "false");
         }
 
-        Log.d(TAG, "addData: Adding " + room.getName() +  " " + room.getGps().toString() +
-                " "+ room.getPoints() +  " " + room.getTimestamp() +  " " + room.isRoomFound() +
+        Log.d(TAG, "addData: Adding " + room.getName() + " " + room.getGps().toString() +
+                " " + room.getPoints() + " " + room.getTimestamp() + " " + room.isRoomFound() +
                 " to " + TABLE_NAME);
 
         //insert the content of the contentValue into the table, the null is optional and used for:
         //SQL doesn't allow inserting a completely empty row without naming at least one column name.
         //If your provided contentValues is empty, no column names are known and an empty row can't be inserted
         //The function returns the rowID of the newly inserted row, or -1 if an error occurred
-        long result = db.insert(TABLE_NAME, null, contentValues);
+        long result = -1;
+        try {
+            result = db.insertOrThrow(TABLE_NAME, null, contentValues);
+        } catch (SQLiteConstraintException e) {
+            if (BuildConfig.DEBUG) {
+                e.printStackTrace();
+            }
+        }
 
         //check if data is inserted correctly
-        if (result == -1){
+        if (result == -1) {
             return false;
-        }
-        else{
+        } else {
             return true;
         }
     }
@@ -95,10 +106,11 @@ public class DatabaseHelperRoom extends SQLiteOpenHelper {
     /**
      * get the id of a certain item, if there are multiple items with the same name, the
      * first id is returned
+     *
      * @param room
      * @return
      */
-    public Cursor getSpecificRoom(Room room){
+    public Cursor getSpecificRoom(Room room) {
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COL_NAME + " = '" + room.getName() + "'";
         Cursor data = db.rawQuery(query, null);
@@ -107,10 +119,11 @@ public class DatabaseHelperRoom extends SQLiteOpenHelper {
 
     /**
      * Method for finding rooms when one does not have complete Object, but only the name of the room
+     *
      * @param roomName
      * @return
      */
-    public Cursor getSpecificRoom(String roomName){
+    public Cursor getSpecificRoom(String roomName) {
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COL_NAME + " = '" + roomName + "'";
         Cursor data = db.rawQuery(query, null);
@@ -119,9 +132,10 @@ public class DatabaseHelperRoom extends SQLiteOpenHelper {
 
     /**
      * All entries of the tbale are returned
+     *
      * @return
      */
-    public Cursor getAllRooms(){
+    public Cursor getAllRooms() {
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME;
         Cursor data = db.rawQuery(query, null);
@@ -130,9 +144,10 @@ public class DatabaseHelperRoom extends SQLiteOpenHelper {
 
     /**
      * updates an entry of the database where the ids match
+     *
      * @param room
      */
-    public void updateRoomFound(Room room){
+    public void updateRoomFound(Room room) {
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "UPDATE " + TABLE_NAME + " SET " + COL_ROOMFOUND + " = 'true' WHERE "
                 + COL_NAME + " = '" + room.getName() + "'";
@@ -141,7 +156,7 @@ public class DatabaseHelperRoom extends SQLiteOpenHelper {
         db.execSQL(query);
     }
 
-    public Cursor getRoomsNotFound(){
+    public Cursor getRoomsNotFound() {
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COL_ROOMFOUND + " != 'true'";
         Cursor data = db.rawQuery(query, null);
@@ -150,9 +165,10 @@ public class DatabaseHelperRoom extends SQLiteOpenHelper {
 
     /**
      * delete an entry, where id and name match
+     *
      * @param name
      */
-    public void deleteRoom(String name){
+    public void deleteRoom(String name) {
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "DELETE FROM " + TABLE_NAME + " WHERE " + COL_NAME + " = '" + name + "'";
         Log.d(TAG, "deleteName: query: " + query);
@@ -160,10 +176,10 @@ public class DatabaseHelperRoom extends SQLiteOpenHelper {
         db.execSQL(query);
     }
 
-    public void updateRoom(Room room){
+    public void updateRoom(Room room) {
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "UPDATE " + TABLE_NAME + " SET " + COL_GPS + " = '" + room.getGps() + "', " + COL_POINTS + " = '" + room.getPoints() + "', "
-                + COL_TIMESTAMP + " = '" + room.getTimestamp() + "', " + COL_ROOMFOUND + " = '" + room.isRoomFound() + "' WHERE " + COL_NAME + " = '" + room.getName()+"'";
+                + COL_TIMESTAMP + " = '" + room.getTimestamp() + "', " + COL_ROOMFOUND + " = '" + room.isRoomFound() + "' WHERE " + COL_NAME + " = '" + room.getName() + "'";
         Log.d(TAG, "updateName: query: " + query);
         db.execSQL(query);
     }

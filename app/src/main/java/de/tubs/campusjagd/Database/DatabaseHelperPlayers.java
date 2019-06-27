@@ -3,9 +3,12 @@ package de.tubs.campusjagd.Database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import de.tubs.campusjagd.BuildConfig;
 
 public class DatabaseHelperPlayers extends SQLiteOpenHelper {
 
@@ -68,7 +71,14 @@ public class DatabaseHelperPlayers extends SQLiteOpenHelper {
         //SQL doesn't allow inserting a completely empty row without naming at least one column name.
         //If your provided contentValues is empty, no column names are known and an empty row can't be inserted
         //The function returns the rowID of the newly inserted row, or -1 if an error occurred
-        long result = db.insert(TABLE_NAME, null, contentValues);
+        long result = -1;
+        try {
+            result = db.insertOrThrow(TABLE_NAME, null, contentValues);
+        } catch (SQLiteConstraintException e) {
+            if (BuildConfig.DEBUG) {
+                e.printStackTrace();
+            }
+        }
 
         //check if data is inserted correctly
         if (result == -1) {
