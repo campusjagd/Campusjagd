@@ -195,6 +195,7 @@ public class Resources {
         //adding the challenge to the database
         //if there is already a challenge by that name in the DB this will fail without a serious error
         mDatabaseHelperChallenge.addChallenge(challenge);
+        addToAllChallengeNames(challenge.getName());
         //if the challenge already exists the update function is called to set the correct values
         //for that challenge
         updateChallenge(challenge);

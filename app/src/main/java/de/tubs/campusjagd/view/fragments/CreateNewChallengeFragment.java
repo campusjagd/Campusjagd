@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,6 +75,11 @@ public class CreateNewChallengeFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if (!mResources.checkIfChallengeNameAvailable(mChallengeNameEditText.getText().toString())) {
+                    Toast.makeText(CreateNewChallengeFragment.this.getContext(), "Challenge Name schon vorhanden.", Toast.LENGTH_LONG).show();
+                    return;
+                }
                 // Create a new challenge and save it
                 CreateNewChallengeFragment.this.createNewChallenge();
 
@@ -100,8 +106,8 @@ public class CreateNewChallengeFragment extends Fragment {
         List<Room> roomList = new ArrayList<>(mRoomAdapter.getSelectedRooms());
         Challenge createdChallenge =  new Challenge(challengeName, roomList);
 
-        // Save to resources
         mResources.saveChallenge(createdChallenge);
+
     }
 
     @Override
