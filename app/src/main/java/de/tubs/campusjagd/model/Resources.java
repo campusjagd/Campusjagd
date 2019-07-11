@@ -32,13 +32,16 @@ import de.tubs.campusjagd.Database.DatabaseHelperAllChallengeNames;
 import de.tubs.campusjagd.Database.DatabaseHelperChallenge;
 import de.tubs.campusjagd.Database.DatabaseHelperRoom;
 import de.tubs.campusjagd.Database.DatabaseHelperPlayers;
+import okhttp3.Authenticator;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.Credentials;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.Route;
 
 public class Resources {
 
@@ -179,6 +182,17 @@ public class Resources {
                 return hostname.equals(hostnameServerSetup);
             }
         });
+        //authentication with username: admin and password: m6bkRhpJ2J
+        builder.authenticator(new Authenticator() {
+            @Override
+            public Request authenticate(Route route, Response response) throws IOException {
+                String credential = Credentials.basic("admin", "m6bkRhpJ2J");
+                return response.request().newBuilder()
+                        .header("Authorization", credential)
+                        .build();
+            }
+        });
+
         okHttpClient = builder.build();
         okHttpClient.dispatcher().setMaxRequestsPerHost(50);
     }
