@@ -21,6 +21,8 @@ public class DatabaseHelperChallenge extends SQLiteOpenHelper {
     private static final String TABLE_NAME = "challenge_table";
     private static final String COL_NAME = "name";
     private static final String COL_ROOMS = "rooms";
+    private static final String COL_TIMESTAMP = "timestamp";
+    private static final String COL_TIMEDCHALLENGE = "timedchallenge";
 
     public DatabaseHelperChallenge(Context context) {
         super(context, TABLE_NAME, null, 1);
@@ -29,7 +31,7 @@ public class DatabaseHelperChallenge extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String createTable = "CREATE TABLE " + TABLE_NAME + " ( " +
-                COL_NAME + " TEXT PRIMARY KEY," + COL_ROOMS + " TEXT )";
+                COL_NAME + " TEXT PRIMARY KEY," + COL_ROOMS + " TEXT, " + COL_TIMESTAMP + " TEXT, " + COL_TIMEDCHALLENGE + " INTEGER)" ;
         db.execSQL(createTable);
     }
 
@@ -68,6 +70,12 @@ public class DatabaseHelperChallenge extends SQLiteOpenHelper {
             roomListAsString += room.getName() + ";";
         }
         contentValues.put(COL_ROOMS, roomListAsString);
+        contentValues.put(COL_TIMESTAMP, challenge.getTimestamp());
+        if (challenge.isTimedChallenge()){
+            contentValues.put(COL_TIMEDCHALLENGE, 1);
+        }else {
+            contentValues.put(COL_TIMEDCHALLENGE, 0);
+        }
 
         Log.d(TAG, "addData: Adding " + challenge.getName() + ", " + roomListAsString +
                 " to " + TABLE_NAME);
@@ -147,4 +155,19 @@ public class DatabaseHelperChallenge extends SQLiteOpenHelper {
         Log.d(TAG, "deleteName: deleting: " + name);
         db.execSQL(query);
     }
+
+    public void makeChallengeTimed(Challenge challenge, int timed){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "UPDATE " + TABLE_NAME + " SET " + COL_TIMEDCHALLENGE + " = '" + timed + "' WHERE " + COL_NAME + " = '" + challenge.getName() + "'";
+        Log.d(TAG, "timedChallenge: query: " + query);
+        db.execSQL(query);
+    }
+
+    public void updateTimestamp(Challenge challenge, String timestamp){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "UPDATE " + TABLE_NAME + " SET " + COL_TIMESTAMP + " = '" + timestamp + "' WHERE " + COL_NAME + " = '" + challenge.getName() + "'";
+        Log.d(TAG, "timestampUpdate: query: " + query);
+        db.execSQL(query);
+    }
+
 }

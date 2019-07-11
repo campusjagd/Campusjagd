@@ -151,8 +151,8 @@ public class DatabaseHelperRoom extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "UPDATE " + TABLE_NAME + " SET " + COL_ROOMFOUND + " = 'true' WHERE "
                 + COL_NAME + " = '" + room.getName() + "'";
-        Log.d(TAG, "updateName: query: " + query);
-        Log.d(TAG, "updateName: Setting to: " + true);
+        Log.d(TAG, "updateFound: query: " + query);
+        Log.d(TAG, "updateFound: Setting to: " + true);
         db.execSQL(query);
     }
 
@@ -180,8 +180,16 @@ public class DatabaseHelperRoom extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "UPDATE " + TABLE_NAME + " SET " + COL_GPS + " = '" + room.getGps() + "', " + COL_POINTS + " = '" + room.getPoints() + "', "
                 + COL_TIMESTAMP + " = '" + room.getTimestamp() + "', " + COL_ROOMFOUND + " = '" + room.isRoomFound() + "' WHERE " + COL_NAME + " = '" + room.getName() + "'";
-        Log.d(TAG, "updateName: query: " + query);
+        Log.d(TAG, "updateRoom: query: " + query);
         db.execSQL(query);
     }
 
+    public void setRoomNotFound(Room room) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "UPDATE " + TABLE_NAME + " SET " + COL_ROOMFOUND + " = 'false' WHERE "
+                + COL_NAME + " = '" + room.getName() + "'";
+        Log.d(TAG, "updateNotFound: query: " + query);
+        Log.d(TAG, "updateNotFound: Setting to: " + true);
+        db.execSQL(query);
+    }
 }

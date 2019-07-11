@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import de.tubs.campusjagd.MainActivity;
@@ -98,7 +99,7 @@ public class CreateNewChallengeFragment extends Fragment {
         // Get values
         String challengeName = mChallengeNameEditText.getText().toString();
         List<Room> roomList = new ArrayList<>(mRoomAdapter.getSelectedRooms());
-        Challenge createdChallenge =  new Challenge(challengeName, roomList);
+        Challenge createdChallenge =  new Challenge(challengeName, roomList, Calendar.getInstance().getTime().toString(), false);
 
         // Save to resources
         mResources.saveChallenge(createdChallenge);
