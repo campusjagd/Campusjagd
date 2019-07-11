@@ -21,14 +21,22 @@ def update_user():
     if db.session.query(User).filter_by(name=data['name']).first():
         # update user points
         user = db.session.query(User).filter_by(name=data['name']).first()
-        user.points = data['points']
+        if 'points' in data:
+            user.points = data['points']
+        if 'new_name' in data:
+            if db.session.query(User).filter_by(name=data['new_name']).first() is None:
+                # update username
+                user.name = data['new_name']
+            else:
+                return bad_request('new username already taken')
         db.session.add(user)
         db.session.commit()
     else:
         # add user with points
         user = User()
         user.name = data['name']
-        user.points = data['points']
+        if 'points' in data:
+            user.points = data['points']
         db.session.add(user)
         db.session.commit()
     response = jsonify(user.to_dict())
