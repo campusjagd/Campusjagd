@@ -20,6 +20,7 @@
     <!-- Highscore Fragment -->
     <string name="highscore_header_name">Name:</string>
     <string name="highscore_header_points">Punkte:</string>
+    <string name="highscore_header_online">Online Highscore:</string>
 
     <!-- Menu toolbar header-->
     <string name="stats_header">Gefundene POIs</string>

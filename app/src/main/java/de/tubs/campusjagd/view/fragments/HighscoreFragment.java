@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,6 +31,8 @@ public class HighscoreFragment extends Fragment {
     TextView mOwnPointsTextView;
     RecyclerView mHighscoreRecyclerView;
     HighscoreAdapter mHighscoreAdapter;
+    ConstraintLayout mSeperationBar;
+    ConstraintLayout mOwnPlayerBar;
 
     @Nullable
     @Override
@@ -45,27 +48,10 @@ public class HighscoreFragment extends Fragment {
     private void init(View view) {
         mOwnNameTextView = view.findViewById(R.id.highscore_own_name);
         mOwnPointsTextView = view.findViewById(R.id.highscore_own_points);
+        mSeperationBar = view.findViewById(R.id.highscore_seperation_bar);
+        mOwnPlayerBar = view.findViewById(R.id.highscore_own_player_bar);
 
         Resources resources = Resources.getInstance(view.getContext());
-
-        mOwnNameTextView.setText(resources.getUserName());
-
-        int points = 0;
-        for (Room room : resources.getAllRooms()) {
-            if (room.isRoomFound()) {
-                points += room.getPoints();
-            }
-        }
-        resources.setUserScore(points);
-        mOwnPointsTextView.setText(Integer.toString(points));
-
-
-        // Start adapter
-        mHighscoreRecyclerView = view.findViewById(R.id.highscore_all_points);
-        mHighscoreRecyclerView.setHasFixedSize(true);
-        LinearLayoutManager llm = new LinearLayoutManager(view.getContext());
-        mHighscoreRecyclerView.setLayoutManager(llm);
-
         List<Player> highscorePlayer = new ArrayList<>();
         try{
             highscorePlayer = Resources.getInstance(view.getContext()).getTopTenPlayers();
@@ -73,8 +59,32 @@ public class HighscoreFragment extends Fragment {
             Logger.LogExeption(HighscoreFragment.class.getSimpleName(), "Unable to initialize playerlist", exception);
         }
 
-        mHighscoreAdapter = new HighscoreAdapter(highscorePlayer);
-        mHighscoreRecyclerView.setAdapter(mHighscoreAdapter);
+        // Dont show the highscore list at all
+        if (highscorePlayer.isEmpty()) {
+            mSeperationBar.setVisibility(View.GONE);
+            this.setOfflineHighscore(resources);
+            return;
+        }
+
+        boolean userIsInHighscore = false;
+        for (Player player : highscorePlayer) {
+            if (player.getName().equals(resources.getUserName())) {
+                userIsInHighscore = true;
+            }
+        }
+
+
+        if (userIsInHighscore) {
+            mSeperationBar.setVisibility(View.GONE);
+            mOwnPlayerBar.setVisibility(View.GONE);
+            this.setOnlineHighscore(view, highscorePlayer, resources);
+
+        } else {
+            this.setOfflineHighscore(resources);
+            this.setOnlineHighscore(view,highscorePlayer,resources);
+        }
+
+
 
     }
 
@@ -92,10 +102,38 @@ public class HighscoreFragment extends Fragment {
 
         // Refresh the playerlist
         try {
-            mHighscoreAdapter.updatePlayerList(Resources.getInstance(this.getContext()).getTopTenPlayers());
+            if (mHighscoreAdapter != null) {
+                mHighscoreAdapter.updatePlayerList(Resources.getInstance(this.getContext()).getTopTenPlayers());
 
+            }
         } catch (SQLiteException exception) {
             Logger.LogExeption(HighscoreFragment.class.getSimpleName(), "Unable to update playerlist", exception);
         }
+    }
+
+    private void setOfflineHighscore(Resources resources){
+        mOwnNameTextView.setText(resources.getUserName());
+
+        int points = 0;
+        for (Room room : resources.getAllRooms()) {
+            if (room.isRoomFound()) {
+                points += room.getPoints();
+            }
+        }
+        resources.setUserScore(points);
+        mOwnPointsTextView.setText(Integer.toString(points));
+    }
+
+    private void setOnlineHighscore(View view, List<Player> highscorePlayer, Resources resources){
+        // Start adapter
+        mHighscoreRecyclerView = view.findViewById(R.id.highscore_all_points);
+        mHighscoreRecyclerView.setHasFixedSize(true);
+        LinearLayoutManager llm = new LinearLayoutManager(view.getContext());
+        mHighscoreRecyclerView.setLayoutManager(llm);
+
+
+
+        mHighscoreAdapter = new HighscoreAdapter(highscorePlayer, resources.getUserName(), getContext().getResources().getColor(R.color.white));
+        mHighscoreRecyclerView.setAdapter(mHighscoreAdapter);
     }
 }
