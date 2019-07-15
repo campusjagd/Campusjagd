@@ -3,6 +3,7 @@ from sqlalchemy import Table, Column, Integer, ForeignKey, DateTime, Boolean
 from sqlalchemy.orm import relationship
 # from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
+from qrcodegen import *
 
 # Base = declarative_base()
 
@@ -42,6 +43,10 @@ class Challenge(db.Model):
             "rooms": [room.to_dict() for room in self.rooms],
         }
         return data
+    def get_QRC(self):
+        qr0 = QrCode.encode_text(str(self.to_dict()), QrCode.Ecc.MEDIUM)
+        svg = qr0.to_svg_str(4)
+        return svg
 
 class User(db.Model):
     __tablename__='User'

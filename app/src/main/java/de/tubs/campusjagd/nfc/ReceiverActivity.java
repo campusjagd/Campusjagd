@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import de.tubs.campusjagd.R;
@@ -169,7 +170,7 @@ public class ReceiverActivity extends AppCompatActivity implements NfcAdapter.Cr
             roomList.add(room);
         }
 
-        Challenge challenge = new Challenge(challengeName, roomList);
+        Challenge challenge = new Challenge(challengeName, roomList, Calendar.getInstance().getTime().toString(), false);
         Resources.getInstance(this).addChallenge(challenge);
         Resources.getInstance(this).getAndSaveSpecificChallengeServer(challengeName);
     }

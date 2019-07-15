@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card deep-orange lighten-3">
+  <div class="card-content white-text">
+    <span class="card-title">{{c.title}} {% if c.official == true %}<i class="material-icons small" style="float:right;">stars</i>{%endif%}</span>
+    <p>Rooms: {{c.rooms}}</p>
+    <p>Total points: {{c.points}}</p>
+    QR-Code
+    <div class="svg" style="width:200px;height:200px;">
+      {{challenge_object.get_QRC() | safe}}
+      </svg>
+    </div>
+  </div>
+</div>
+{% endblock %}
