@@ -3,11 +3,9 @@ package de.tubs.campusjagd.view.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,12 +13,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.Date;
 import java.util.List;
 
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.model.Challenge;
 import de.tubs.campusjagd.nfc.SenderActivity;
-import de.tubs.campusjagd.view.fragments.PeerToPeerFragment;
 
 /**
  * Adapter holding all challenges which should be created.
@@ -145,6 +143,16 @@ public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCr
             }
         });
 
+        if (challenge.isTimedChallenge()) {
+            Date challengeEndTime = new Date(challenge.getEndTimeStamp());
+
+            holder.timeNeeded.setText(ChallengeListAdapter.hmsTimeFormatter(challengeEndTime.getTime()));
+            holder.background.setBackgroundColor(mContext.getResources().getColor(R.color.colorPrimary));
+        } else {
+            holder.timeNeeded.setVisibility(View.GONE);
+            holder.background.setBackgroundColor(mContext.getResources().getColor(R.color.white));
+        }
+
     }
 
     @Override
@@ -162,6 +170,8 @@ class ChallengeCreateViewHolder extends RecyclerView.ViewHolder{
     View hiddenView;
     RecyclerView recyclerView;
     FloatingActionButton fab;
+    TextView timeNeeded;
+    View background;
 
     public ChallengeCreateViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -170,5 +180,7 @@ class ChallengeCreateViewHolder extends RecyclerView.ViewHolder{
         hiddenView = itemView.findViewById(R.id.challenge_create_hiddenView);
         recyclerView = itemView.findViewById(R.id.challenge_create_recyclerview);
         fab = itemView.findViewById(R.id.challenge_create_fab);
+        timeNeeded = itemView.findViewById(R.id.challenge_create_challenge_time);
+        background = itemView.findViewById(R.id.challenge_create_challenge_item_background);
     }
 }

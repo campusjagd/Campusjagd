@@ -1,5 +1,6 @@
 package de.tubs.campusjagd.model;
 
+import java.util.Date;
 import java.util.List;
 
 public class Challenge {
@@ -34,6 +35,13 @@ public class Challenge {
 
     public String getTimestamp() {
         return this.timestamp;
+    }
+
+    public String getEndTimeStamp() {
+        Date date1 = new Date();
+        Date date2 = new Date(date1.getTime() + 1000000);
+
+        return new Date(date2.getTime() - date1.getTime()).toString();
     }
 
     public void setTimestamp(String timestamp) {

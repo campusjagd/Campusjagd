@@ -200,16 +200,6 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeViewHold
             Date challengeStartDate = new Date(challenge.getTimestamp());
             Date now = new Date();
             long timeDifference_in_millis = now.getTime() - challengeStartDate.getTime();
-            long timeDifference_in_seconds = timeDifference_in_millis / 1000;
-
-            long timeToWorkWith = timeDifference_in_seconds;
-            long seconds = timeToWorkWith % 60;
-            timeToWorkWith/= 60;
-            long minutes = timeToWorkWith % 60;
-            timeToWorkWith/= 60;
-            long hours = timeToWorkWith % 24;
-            timeToWorkWith /= 24;
-            long days = timeToWorkWith;
 
             mTimerString = hmsTimeFormatter(timeDifference_in_millis);
     }
@@ -221,7 +211,7 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeViewHold
      * @return HH:mm:ss time formatted string
      */
     @SuppressLint("DefaultLocale")
-    private String hmsTimeFormatter(long milliSeconds) {
+    public static String hmsTimeFormatter(long milliSeconds) {
 
         String hms;
 
