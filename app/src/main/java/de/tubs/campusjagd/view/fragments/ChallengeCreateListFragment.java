@@ -67,7 +67,7 @@ public class ChallengeCreateListFragment extends Fragment {
         mCreateNewChallengeFragment = new CreateNewChallengeFragment();
 
         // Set up fab
-        FloatingActionButton fab = view.findViewById(R.id.challenge_create_fab);
+        FloatingActionButton fab = view.findViewById(R.id.challenge_delete_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
