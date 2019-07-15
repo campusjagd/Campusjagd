@@ -134,7 +134,7 @@ public class Resources {
         roomlist3.add(room1);
 
 
-        Challenge challenge1 = new Challenge("MockChallenge 1", roomlist1, Calendar.getInstance().getTime().toString(), false);
+        Challenge challenge1 = new Challenge("MockChallenge 1", roomlist1, Calendar.getInstance().getTime().toString(), true);
         Challenge challenge2 = new Challenge("MockChallenge 2", roomlist2, Calendar.getInstance().getTime().toString(), false);
         Challenge challenge3 = new Challenge("MockChallenge 3", roomlist3, Calendar.getInstance().getTime().toString(), false);
 

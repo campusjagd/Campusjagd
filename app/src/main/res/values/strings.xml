@@ -39,6 +39,11 @@
     <string name="settings_check_username_failure">Das hat leider nicht funktioniert. Der Nutzername ist schon weg :-/</string>
 
     <string name="create_challenge_name">Challenge Name</string>
+    <string name="challenge_list_delete_button_pressed">Sicher dass du die Challenge löschen möchtest?</string>
+    <string name="challenge_list_redo_button_pressed">Sicher dass du die Challenge nochmal als Challenge auf Zeit neustarten möchtest?\n\nAlle Räume der Challenge werden wieder als nicht gefunden markiert.</string>
+    <string name="challenge_list_redo_button_pressed_is_already_time_challenge">Sicher, dass du die Zeitchallenge aufhören möchtest? \n\nDeine bisher in der Challenge gefundenen Räume bleiben erhalten.</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
     <string name="create_room_name">POI-Name</string>
     <string name="create_room_name_hint">z.B. IZ 160</string>
     <string name="create_room_points">Punkte</string>

@@ -1,42 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <android.support.v7.widget.CardView
+        android:id="@+id/challenge_card_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
         android:minHeight="@dimen/card_min_height"
         android:padding="8dp">
 
-        <LinearLayout
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
-                <TextView
-                    android:id="@+id/challenge_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="@dimen/card_header_padding"
-                    android:textStyle="bold"/>
+            <ImageView
+                android:id="@+id/challenge_card_delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_weight="1"
+                app:layout_constraintBottom_toBottomOf="@+id/challenge_name"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@android:drawable/ic_delete" />
 
-                <LinearLayout
-                    android:id="@+id/hiddenView"
+            <ImageView
+                android:id="@+id/challenge_card_redo"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginEnd="24dp"
+                android:layout_weight="1"
+                app:layout_constraintBottom_toBottomOf="@+id/challenge_card_delete"
+                app:layout_constraintEnd_toStartOf="@+id/challenge_card_delete"
+                app:layout_constraintTop_toTopOf="@+id/challenge_card_delete"
+                app:srcCompat="@android:drawable/ic_menu_revert" />
+
+            <TextView
+                android:id="@+id/challenge_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:padding="@dimen/card_header_padding"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/hiddenView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@+id/challenge_name">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/challenge_item_recyclerView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_height="wrap_content">
 
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/challenge_item_recyclerView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                </android.support.v7.widget.RecyclerView>
+            </LinearLayout>
 
-                    </android.support.v7.widget.RecyclerView>
-                </LinearLayout>
-        </LinearLayout>
+            <TextView
+                android:id="@+id/challenge_card_timer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="TextView"
+                app:layout_constraintBottom_toBottomOf="@+id/challenge_name"
+                app:layout_constraintEnd_toStartOf="@+id/challenge_card_redo"
+                app:layout_constraintStart_toEndOf="@+id/challenge_name"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </android.support.constraint.ConstraintLayout>
+
     </android.support.v7.widget.CardView>
 </FrameLayout>

@@ -2,6 +2,7 @@ package de.tubs.campusjagd.view.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -27,6 +28,7 @@ import com.google.android.gms.vision.barcode.Barcode;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Timer;
 
 import de.tubs.campusjagd.Database.DatabaseHelperRoom;
 import de.tubs.campusjagd.R;
@@ -57,6 +59,8 @@ public class ChallengeListFragment extends Fragment implements CJLocationManager
     PopupMenu mPopup;
     // Location manager to check for gps
     CJLocationManager mLocationManager;
+    // Timer for the time challenges
+    CountDownTimer mTimer;
 
     private static final int RC_BARCODE_CAPTURE = 9001;
 
@@ -142,6 +146,7 @@ public class ChallengeListFragment extends Fragment implements CJLocationManager
                 }
             }
         });
+
     }
 
     /**
@@ -192,6 +197,19 @@ public class ChallengeListFragment extends Fragment implements CJLocationManager
         super.onResume();
 
         mAdapter.notifyDataSetChanged();
+
+        mTimer = new CountDownTimer(1000 * 60 /*seconds*/ * 60 /*minutes*/, 60 * 60 /* every minute*/) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFinish() {
+                ChallengeListFragment.this.onResume();
+            }
+        };
+        mTimer.start();
 
         try {
             // Set toolbar
