@@ -134,9 +134,9 @@ public class Resources {
         roomlist3.add(room1);
 
 
-        Challenge challenge1 = new Challenge("MockChallenge 1", roomlist1, Calendar.getInstance().getTime().toString(), true);
-        Challenge challenge2 = new Challenge("MockChallenge 2", roomlist2, Calendar.getInstance().getTime().toString(), false);
-        Challenge challenge3 = new Challenge("MockChallenge 3", roomlist3, Calendar.getInstance().getTime().toString(), false);
+        Challenge challenge1 = new Challenge("MockChallenge 1", roomlist1, Calendar.getInstance().getTime().toString(), "null",  true);
+        Challenge challenge2 = new Challenge("MockChallenge 2", roomlist2, Calendar.getInstance().getTime().toString(), "null", false);
+        Challenge challenge3 = new Challenge("MockChallenge 3", roomlist3, Calendar.getInstance().getTime().toString(), "null", false);
 
         addChallenge(challenge1);
         addChallenge(challenge2);
@@ -259,14 +259,15 @@ public class Resources {
                 roomList.addAll(instantiateRoomList(roomData));
             }
             String timestamp = data.getString(2);
+            String endTimestamp = data.getString(3);
             boolean timedChallenge;
-            if ( data.getInt(3) == 1){
+            if ( data.getInt(4) == 1){
                 timedChallenge = true;
             }else{
                 timedChallenge = false;
             }
 
-            Challenge challenge = new Challenge(name, roomList, timestamp, timedChallenge);
+            Challenge challenge = new Challenge(name, roomList, timestamp, endTimestamp, timedChallenge);
             challengeList.add(challenge);
         }
         return challengeList;
@@ -353,12 +354,25 @@ public class Resources {
         challenge.setTimedChallenge(timed);
         if (timed){
             mDatabaseHelperChallenge.makeChallengeTimed(challenge, 1);
+            challenge.setTimestamp(Calendar.getInstance().getTime().toString());
+            for (Room room: challenge.getRoomList()){
+                setRoomToNotFound(room);
+            }
         }else{
             mDatabaseHelperChallenge.makeChallengeTimed(challenge, 0);
         }
 
     }
 
+    /**
+     * updates the endtimestamp of a challenge
+     * @param challenge
+     * @param timestamp
+     */
+    public void setEndTimestampChallenge(Challenge challenge, String timestamp){
+        mDatabaseHelperChallenge.setEndTimestamp(challenge, timestamp);
+        challenge.setEndTimestamp(timestamp);
+    }
 
     //=============================================================================================
     //Room Methods
@@ -516,7 +530,7 @@ public class Resources {
                 String challengeName = jsonObject.getString("name");
                 JSONArray jsonArray = jsonObject.getJSONArray("rooms");
                 List<Room> roomList = roomListFromJson(jsonArray);
-                Challenge challenge = new Challenge(challengeName, roomList, Calendar.getInstance().getTime().toString(), false);
+                Challenge challenge = new Challenge(challengeName, roomList, Calendar.getInstance().getTime().toString(), "null", false);
                 addChallenge(challenge);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -725,7 +739,7 @@ public class Resources {
                             String challengeName = mJsonObjectProperty.getString("name");
                             JSONArray rooms = mJsonObjectProperty.getJSONArray("rooms");
                             List<Room> roomListServer = roomListFromJson(rooms);
-                            Challenge challenge = new Challenge(challengeName, roomListServer, Calendar.getInstance().getTime().toString(), false);
+                            Challenge challenge = new Challenge(challengeName, roomListServer, Calendar.getInstance().getTime().toString(), "null", false);
                             //adding the challenge to the database while simultaneously updating it
                             //in case it already exists
                             //if there is already a challenge by that name in the DB this will fail without a serious error
@@ -814,7 +828,7 @@ public class Resources {
                         String name = jsonObject.getString("name");
                         JSONArray rooms = jsonObject.getJSONArray("rooms");
                         List<Room> roomListServer = roomListFromJson(rooms);
-                        Challenge challenge = new Challenge(name, roomListServer, Calendar.getInstance().getTime().toString(), false);
+                        Challenge challenge = new Challenge(name, roomListServer, Calendar.getInstance().getTime().toString(), "null", false);
                         //adding the challenge to the database while simultaneously updating it
                         //in case it already exists
                         //if there is already a challenge by that name in the DB this will fail without a serious error

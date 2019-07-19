@@ -105,7 +105,7 @@ public class CreateNewChallengeFragment extends Fragment {
         // Get values
         String challengeName = mChallengeNameEditText.getText().toString();
         List<Room> roomList = new ArrayList<>(mRoomAdapter.getSelectedRooms());
-        Challenge createdChallenge =  new Challenge(challengeName, roomList, Calendar.getInstance().getTime().toString(), false);
+        Challenge createdChallenge =  new Challenge(challengeName, roomList, Calendar.getInstance().getTime().toString(), "null", false);
 
         mResources.saveChallenge(createdChallenge);
 

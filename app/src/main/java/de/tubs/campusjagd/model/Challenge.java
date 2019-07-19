@@ -8,12 +8,14 @@ public class Challenge {
     private String name;
     private List<Room> roomList;
     private String timestamp;
+    private String endTimestamp;
     private boolean timedChallenge;
 
-    public Challenge(String name, List<Room> roomList, String timestamp, boolean timedChallenge) {
+    public Challenge(String name, List<Room> roomList, String timestamp, String endTimestamp, boolean timedChallenge) {
         this.name = name;
         this.roomList = roomList;
         this.timestamp = timestamp;
+        this.endTimestamp = endTimestamp;
         this.timedChallenge = timedChallenge;
     }
 
@@ -54,5 +56,13 @@ public class Challenge {
 
     public boolean isTimedChallenge() {
         return timedChallenge;
+    }
+
+    public String getEndTimestamp() {
+        return endTimestamp;
+    }
+
+    public void setEndTimestamp(String endTimestamp) {
+        this.endTimestamp = endTimestamp;
     }
 }

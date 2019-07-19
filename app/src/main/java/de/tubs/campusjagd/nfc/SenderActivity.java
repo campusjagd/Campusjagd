@@ -114,7 +114,7 @@ public class SenderActivity extends AppCompatActivity implements NfcAdapter.Crea
                 roomList.addAll(instantiateRoomList(roomData));
             }
 
-            Challenge challenge = new Challenge(name, roomList, Calendar.getInstance().getTime().toString(), false);
+            Challenge challenge = new Challenge(name, roomList, Calendar.getInstance().getTime().toString(), "null", false);
             challengeList.add(challenge);
         }
 

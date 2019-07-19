@@ -170,7 +170,7 @@ public class ReceiverActivity extends AppCompatActivity implements NfcAdapter.Cr
             roomList.add(room);
         }
 
-        Challenge challenge = new Challenge(challengeName, roomList, Calendar.getInstance().getTime().toString(), false);
+        Challenge challenge = new Challenge(challengeName, roomList, Calendar.getInstance().getTime().toString(), "null", false);
         Resources.getInstance(this).addChallenge(challenge);
         Resources.getInstance(this).getAndSaveSpecificChallengeServer(challengeName);
     }

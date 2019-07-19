@@ -22,7 +22,9 @@ public class DatabaseHelperChallenge extends SQLiteOpenHelper {
     private static final String COL_NAME = "name";
     private static final String COL_ROOMS = "rooms";
     private static final String COL_TIMESTAMP = "timestamp";
+    private static final String COL_ENDTIMESTAMP = "endtimestamp";
     private static final String COL_TIMEDCHALLENGE = "timedchallenge";
+
 
     public DatabaseHelperChallenge(Context context) {
         super(context, TABLE_NAME, null, 1);
@@ -31,7 +33,7 @@ public class DatabaseHelperChallenge extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String createTable = "CREATE TABLE " + TABLE_NAME + " ( " +
-                COL_NAME + " TEXT PRIMARY KEY," + COL_ROOMS + " TEXT, " + COL_TIMESTAMP + " TEXT, " + COL_TIMEDCHALLENGE + " INTEGER)" ;
+                COL_NAME + " TEXT PRIMARY KEY," + COL_ROOMS + " TEXT, " + COL_TIMESTAMP + " TEXT, " + COL_ENDTIMESTAMP + " TEXT, " + COL_TIMEDCHALLENGE + " INTEGER)" ;
         db.execSQL(createTable);
     }
 
@@ -71,6 +73,7 @@ public class DatabaseHelperChallenge extends SQLiteOpenHelper {
         }
         contentValues.put(COL_ROOMS, roomListAsString);
         contentValues.put(COL_TIMESTAMP, challenge.getTimestamp());
+        contentValues.put(COL_ENDTIMESTAMP, challenge.getEndTimestamp());
         if (challenge.isTimedChallenge()){
             contentValues.put(COL_TIMEDCHALLENGE, 1);
         }else {
@@ -170,4 +173,10 @@ public class DatabaseHelperChallenge extends SQLiteOpenHelper {
         db.execSQL(query);
     }
 
+    public void setEndTimestamp(Challenge challenge, String timestamp){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "UPDATE " + TABLE_NAME + " SET " + COL_ENDTIMESTAMP + " = '" + timestamp + "' WHERE " + COL_NAME + " = '" + challenge.getName() + "'";
+        Log.d(TAG, "endtimestampUpdate: query: " + query);
+        db.execSQL(query);
+    }
 }
