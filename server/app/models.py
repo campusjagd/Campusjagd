@@ -25,7 +25,7 @@ class Room(db.Model):
             "name": self.name,
             "gpsposition": self.gpsposition,
             "points": self.points,
-            "timestamp": self.timestamp
+            "timestamp": self.timestamp.strftime("%Y-%m-%d %H:%M:%S")
             }
         return data
 
