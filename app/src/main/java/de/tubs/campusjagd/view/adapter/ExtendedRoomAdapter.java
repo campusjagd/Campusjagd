@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.List;
 
+import de.tubs.campusjagd.Database.DatabaseHelperRoom;
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.etc.Logger;
 import de.tubs.campusjagd.etc.PermissionManager;
@@ -94,9 +95,11 @@ public class ExtendedRoomAdapter extends RecyclerView.Adapter<ItemExtendedRoomVi
 
         // Bind holder with element from the list
         holder.roomName.setText(room.getName());
-        holder.timestamp.setText(room.getTimestamp());
-        holder.points.setText(Integer.toString(room.getPoints()));
-        holder.gpsPosition.setText("GPS: " + room.getGps().toString());
+
+        Date date = new Date(room.getTimestamp());
+        holder.timestamp.setText("Hinzugefügt am: " + date.getDay() + "." + date.getMonth() + "." + (date.getYear() + 1900));
+        holder.points.setText("Punkte: " + Integer.toString(room.getPoints()));
+        holder.gpsPosition.setText(room.getGps().toString());
         holder.checkBox.setChecked(room.isRoomFound());
         mBitmap = generateQR(holder.qr, room.toString());
 
