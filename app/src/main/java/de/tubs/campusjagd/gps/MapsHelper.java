@@ -1,6 +1,13 @@
 package de.tubs.campusjagd.gps;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -12,6 +19,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.List;
 
+import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.model.Resources;
 import de.tubs.campusjagd.model.Room;
 
@@ -70,7 +78,7 @@ public class MapsHelper {
         options.title(room.getName());
 
         // Change color of the icon
-        options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+        options.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromVectorDrawable(mContext, R.drawable.ic_campusjagd_pin)));
 
         return options;
     }
@@ -104,4 +112,20 @@ public class MapsHelper {
         return builder;
     }
 
+
+    @SuppressLint("ObsoleteSdkInt")
+    public static Bitmap getBitmapFromVectorDrawable(Context context, int drawableId) {
+        Drawable drawable = ContextCompat.getDrawable(context, drawableId);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            drawable = (DrawableCompat.wrap(drawable)).mutate();
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap((int)(drawable.getIntrinsicWidth() *1.5),
+                (int) (drawable.getIntrinsicHeight() * 1.5), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
+    }
 }
