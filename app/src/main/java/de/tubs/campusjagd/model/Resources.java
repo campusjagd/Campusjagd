@@ -530,6 +530,9 @@ public class Resources {
                 String challengeName = jsonObject.getString("name");
                 JSONArray jsonArray = jsonObject.getJSONArray("rooms");
                 List<Room> roomList = roomListFromJson(jsonArray);
+                for (Room room : roomList){
+                    addRoom(room);
+                }
                 Challenge challenge = new Challenge(challengeName, roomList, Calendar.getInstance().getTime().toString(), "null", false);
                 addChallenge(challenge);
             } catch (JSONException e) {
