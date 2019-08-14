@@ -237,6 +237,7 @@ public class ChallengeListFragment extends Fragment implements CJLocationManager
 
             String answer = getString(R.string.location_check_one_room_found, room.getName());
             Toast.makeText(this.getContext(), answer,Toast.LENGTH_LONG).show();
+            this.onResume();
         } else if (nearbyRooms.size() > 1) {
             String roomAnswer = "";
 
@@ -247,6 +248,7 @@ public class ChallengeListFragment extends Fragment implements CJLocationManager
 
             String answer = getString(R.string.location_check_more_rooms_found, roomAnswer);
             Toast.makeText(this.getContext(), answer,Toast.LENGTH_LONG).show();
+            this.onResume();
         }
     }
 }

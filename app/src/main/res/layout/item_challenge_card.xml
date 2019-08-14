@@ -77,6 +77,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
+                android:visibility="invisible"
                 android:text="TextView"
                 app:layout_constraintBottom_toBottomOf="@+id/challenge_name"
                 app:layout_constraintEnd_toStartOf="@+id/challenge_card_redo"

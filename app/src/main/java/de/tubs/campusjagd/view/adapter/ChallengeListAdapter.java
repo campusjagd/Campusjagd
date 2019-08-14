@@ -28,7 +28,7 @@ import de.tubs.campusjagd.view.fragments.ChallengeListFragment;
  *
  * @author leon.brettin@tu-bs.de
  */
-public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeViewHolder> {
+public class ChallengeListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     /**
      * List of all challenges which should be displayed
@@ -69,18 +69,37 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeViewHold
     }
 
     /**
+     * The recyclerview recycles the view of other elements in the list...
+     * Because we have different types of views (timechallenge & no timechallenge) we must specify a viewtype
+     * for the elements.
+     * @param position Position of the element in the recyclerview
+     * @return  1 if the element is a timechallenge
+     *          0 if its a normal element
+     */
+    @Override
+    public int getItemViewType(int position) {
+        return mChallenges.get(position).isTimedChallenge() ? 1 : 0;
+    }
+
+    /**
      * Method which will be called when the view should be created.
      *
      * @param parent Parent view
-     * @param i We dont need this but its necessary for the API
      * @return Inflated view
      */
     @NonNull
     @Override
-    public ChallengeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent,int viewtype) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_challenge_card, parent, false);
 
-        return new ChallengeViewHolder(v);
+        switch (viewtype){
+            case 0:
+                return new ChallengeViewHolderNoTimeChallenge(v);
+            case 1:
+                return new ChallengeViewHolderTimeChallenge(v);
+        }
+
+        throw new Error("You forgot to implement the new type of viewholder here");
     }
 
     /**
@@ -91,101 +110,193 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeViewHold
      * @param position Position of the view in our list
      */
     @Override
-    public void onBindViewHolder(@NonNull final ChallengeViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, final int position) {
         final Challenge challenge = mChallenges.get(position);
 
-        // Set name for challenge in view
-        holder.challengeName.setText(challenge.getName());
+        // I put those in different switch cases... this is definitly not the best way
+        switch (holder.getItemViewType()) {
+            case 0:
+            {
+                ChallengeViewHolderNoTimeChallenge viewHolder = (ChallengeViewHolderNoTimeChallenge)holder;
 
-        //Add rooms to roomlist
-        // Set up recyclerview for rooms
-        LinearLayoutManager llm = new LinearLayoutManager(mContext);
-        holder.challengeRooms.setLayoutManager(llm);
-        // Bind adapter
+                // Set name for challenge in view
+                viewHolder.challengeName.setText(challenge.getName());
 
-        holder.background.setBackgroundColor(mContext.getResources().getColor(
-                challenge.isTimedChallenge()
-                        ?   R.color.colorPrimary
-                        :   R.color.white
-                ));
+                //Add rooms to roomlist
+                // Set up recyclerview for rooms
+                LinearLayoutManager llm = new LinearLayoutManager(mContext);
+                viewHolder.challengeRooms.setLayoutManager(llm);
+                // Bind adapter
 
-
-        holder.challengeRooms.setAdapter(new RoomAdapter(challenge.getRoomList()));
+                viewHolder.background.setBackgroundColor(mContext.getResources().getColor(R.color.white));
 
 
-        // Expansion of challenge when you click on it
-        final boolean isExpanded = position == mExpandedPosition;
-        holder.hiddenView.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
-        holder.itemView.setActivated(isExpanded);
-        final int itemposition = holder.getAdapterPosition();
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mExpandedPosition = isExpanded ? -1 : itemposition;
+                viewHolder.challengeRooms.setAdapter(new RoomAdapter(challenge.getRoomList()));
 
-                // You can add a transition later with (But you have to implement stuff here later
-                //TransitionManager.beginDelayedTransition(mRecyclerView);
 
-                notifyItemChanged(itemposition);
+                // Expansion of challenge when you click on it
+                final boolean isExpanded = position == mExpandedPosition;
+                viewHolder.hiddenView.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+                holder.itemView.setActivated(isExpanded);
+                final int itemposition = holder.getAdapterPosition();
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int oldExpandedPosition = mExpandedPosition;
+                        mExpandedPosition = isExpanded ? -1 : itemposition;
+
+                        // You can add a transition later with (But you have to implement stuff here later
+                        //TransitionManager.beginDelayedTransition(mRecyclerView);
+
+                        notifyItemChanged(oldExpandedPosition);
+                        notifyItemChanged(itemposition);
+
+
+                    }
+                });
+
+                viewHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                        builder.setMessage(R.string.challenge_list_delete_button_pressed)
+                                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        // User cancelled the dialog
+                                    }
+                                })
+                                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        Resources.getInstance(mContext).deleteChallenge(challenge.getName());
+                                        ChallengeListAdapter.this.mChallenges.remove(position);
+                                        ChallengeListAdapter.this.notifyItemRemoved(position);
+                                    }
+                                });
+                        // Create the AlertDialog object and return it
+                        builder.create().show();
+
+                    }
+                });
+
+                viewHolder.redoButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                        builder.setMessage(R.string.challenge_list_redo_button_pressed)
+                                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        // User cancelled the dialog
+                                    }
+                                })
+                                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        Resources.getInstance(mContext).setChallengeTimedOrUntimed(challenge, !challenge.isTimedChallenge());
+
+                                        ChallengeListAdapter.this.mChallenges.get(position).setTimedChallenge(!challenge.isTimedChallenge());
+                                        ChallengeListAdapter.this.notifyItemChanged(position);
+
+                                        challenge.setTimedChallenge(!challenge.isTimedChallenge());
+
+                                    }
+                                });
+                        // Create the AlertDialog object and return it
+                        builder.create().show();
+                    }
+                });
+                break;
             }
-        });
+            case 1:
+            {
+                ChallengeViewHolderTimeChallenge viewHolder = (ChallengeViewHolderTimeChallenge) holder;
 
-        holder.deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                builder.setMessage(R.string.challenge_list_delete_button_pressed)
-                        .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                // User cancelled the dialog
-                            }
-                        })
-                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                Resources.getInstance(mContext).deleteChallenge(challenge.getName());
-                                ChallengeListAdapter.this.mChallenges.remove(position);
-                                ChallengeListAdapter.this.notifyItemRemoved(position);
-                            }
-                        });
-                // Create the AlertDialog object and return it
-                builder.create().show();
 
+                // Set name for challenge in view
+                viewHolder.challengeName.setText(challenge.getName());
+
+                //Add rooms to roomlist
+                // Set up recyclerview for rooms
+                LinearLayoutManager llm = new LinearLayoutManager(mContext);
+                viewHolder.challengeRooms.setLayoutManager(llm);
+                // Bind adapter
+
+                viewHolder.background.setBackgroundColor(mContext.getResources().getColor(R.color.colorPrimary));
+
+
+                viewHolder.challengeRooms.setAdapter(new RoomAdapter(challenge.getRoomList()));
+
+
+                // Expansion of challenge when you click on it
+                final boolean isExpanded = position == mExpandedPosition;
+                viewHolder.hiddenView.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+                holder.itemView.setActivated(isExpanded);
+                final int itemposition = holder.getAdapterPosition();
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int oldExpandedPosition = mExpandedPosition;
+                        mExpandedPosition = isExpanded ? -1 : itemposition;
+
+                        // You can add a transition later with (But you have to implement stuff here later
+                        //TransitionManager.beginDelayedTransition(mRecyclerView);
+
+                        notifyItemChanged(oldExpandedPosition);
+                        notifyItemChanged(itemposition);
+                    }
+                });
+
+                viewHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                        builder.setMessage(R.string.challenge_list_delete_button_pressed)
+                                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        // User cancelled the dialog
+                                    }
+                                })
+                                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        Resources.getInstance(mContext).deleteChallenge(challenge.getName());
+                                        ChallengeListAdapter.this.mChallenges.remove(position);
+                                        ChallengeListAdapter.this.notifyItemRemoved(position);
+                                    }
+                                });
+                        // Create the AlertDialog object and return it
+                        builder.create().show();
+
+                    }
+                });
+
+                viewHolder.redoButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                        builder.setMessage(R.string.challenge_list_redo_button_pressed_is_already_time_challenge)
+                                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        // User cancelled the dialog
+                                    }
+                                })
+                                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        Resources.getInstance(mContext).setChallengeTimedOrUntimed(challenge, !challenge.isTimedChallenge());
+
+                                        ChallengeListAdapter.this.mChallenges.get(position).setTimedChallenge(!challenge.isTimedChallenge());
+                                        ChallengeListAdapter.this.notifyItemChanged(position);
+
+                                        challenge.setTimedChallenge(!challenge.isTimedChallenge());
+
+                                    }
+                                });
+                        // Create the AlertDialog object and return it
+                        builder.create().show();
+                    }
+                });
+
+                updateTime(challenge);
+                viewHolder.timerTextView.setText(mTimerString);
+                break;
             }
-        });
-
-        holder.redoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                builder.setMessage(challenge.isTimedChallenge() ?
-                        R.string.challenge_list_redo_button_pressed_is_already_time_challenge
-                        : R.string.challenge_list_redo_button_pressed)
-                        .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                // User cancelled the dialog
-                            }
-                        })
-                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                Resources.getInstance(mContext).setChallengeTimedOrUntimed(challenge, !challenge.isTimedChallenge());
-
-                                ChallengeListAdapter.this.mChallenges.get(position).setTimedChallenge(!challenge.isTimedChallenge());
-                                ChallengeListAdapter.this.notifyItemChanged(position);
-
-                                challenge.setTimedChallenge(!challenge.isTimedChallenge());
-
-                            }
-                        });
-                // Create the AlertDialog object and return it
-                builder.create().show();
-            }
-        });
-
-        if (!challenge.isTimedChallenge()) {
-            holder.timerTextView.setVisibility(View.GONE);
-        } else {
-            updateTime(challenge);
-            holder.timerTextView.setText(mTimerString);
         }
 
     }
@@ -243,7 +354,7 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeViewHold
 /**
  * Viewholder class for the challenge
  */
-class ChallengeViewHolder extends RecyclerView.ViewHolder {
+class ChallengeViewHolderNoTimeChallenge extends RecyclerView.ViewHolder {
 
     // Name of the challenge
     TextView challengeName;
@@ -270,7 +381,7 @@ class ChallengeViewHolder extends RecyclerView.ViewHolder {
      * Viewholder for a challenge item
      * @param itemView View holding the item
      */
-    ChallengeViewHolder(@NonNull View itemView) {
+    ChallengeViewHolderNoTimeChallenge(@NonNull View itemView) {
         super(itemView);
 
         challengeName = itemView.findViewById(R.id.challenge_name);
@@ -282,4 +393,22 @@ class ChallengeViewHolder extends RecyclerView.ViewHolder {
         background = itemView.findViewById(R.id.challenge_card_layout);
     }
 
+}
+
+/**
+ * Viewholder class for the challenge
+ */
+class ChallengeViewHolderTimeChallenge extends ChallengeViewHolderNoTimeChallenge {
+
+
+    /**
+     * Viewholder for a challenge item
+     *
+     * @param itemView View holding the item
+     */
+    ChallengeViewHolderTimeChallenge(@NonNull View itemView) {
+        super(itemView);
+
+        timerTextView.setVisibility(View.VISIBLE);
+    }
 }
