@@ -27,6 +27,8 @@ import com.google.android.gms.vision.barcode.Barcode;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
 
@@ -82,6 +84,13 @@ public class ChallengeListFragment extends Fragment implements CJLocationManager
         //TODO Change this mock
         Resources resources = Resources.getInstance(view.getContext());
         List<Challenge> challengeList = resources.getAllChallenges();
+
+        List<Challenge> challengeListWithoutFullRooms = new LinkedList<>();
+        for (Challenge challenge : challengeList) {
+            if (!this.isFinishedChallenge(challenge)) {
+                challengeListWithoutFullRooms.add(challenge);
+            }
+        }
         // ------
 
         mChallengeRecycleView = view.findViewById(R.id.challenge_recyclerView);
@@ -93,7 +102,7 @@ public class ChallengeListFragment extends Fragment implements CJLocationManager
         mChallengeRecycleView.setLayoutManager(llm);
 
         // Set up adapter
-        mAdapter = new ChallengeListAdapter(challengeList, view.getContext(), mChallengeRecycleView);
+        mAdapter = new ChallengeListAdapter(challengeListWithoutFullRooms, view.getContext(), mChallengeRecycleView);
         // Bind adapter
         mChallengeRecycleView.setAdapter(mAdapter);
 
@@ -250,5 +259,20 @@ public class ChallengeListFragment extends Fragment implements CJLocationManager
             Toast.makeText(this.getContext(), answer,Toast.LENGTH_LONG).show();
             this.onResume();
         }
+    }
+
+    /**
+     * Check if a challenge is already finished
+     * @param challenge Challenge to check
+     * @return True, if the challenge is already finished
+     *         False, if not
+     */
+    private boolean isFinishedChallenge(Challenge challenge){
+        for (Room room : challenge.getRoomList()) {
+            if (!room.isRoomFound()) {
+                return false;
+            }
+        }
+        return true;
     }
 }
