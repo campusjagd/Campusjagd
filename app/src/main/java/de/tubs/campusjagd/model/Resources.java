@@ -101,47 +101,6 @@ public class Resources {
         //should be made at the start of the app to enable check, if challenge name is possible
         getAndSaveAllChallengeNamesServer();
 
-        Room room1 = new Room(null, new GPS(52.272899, 10.525311), "Raum 161", 2, Calendar.getInstance().getTime().toString(), true);
-        Room room3 = new Room(null, new GPS(), "Raum 74", 10, Calendar.getInstance().getTime().toString(), false);
-        Room room2 = new Room(null, new GPS(52.274760, 10.526023), "Mensa", 1, Calendar.getInstance().getTime().toString(), true);
-        Room room4 = new Room(null, new GPS(), "Raum 111", 2, Calendar.getInstance().getTime().toString(), false);
-        Room room5 = new Room(null, new GPS(52.272678, 10.526844), "Pk 2.2", 4, Calendar.getInstance().getTime().toString(), true);
-        Room room6 = new Room(null, new GPS(), "Raum 262", 6, Calendar.getInstance().getTime().toString(), false);
-        //Room room7 = new Room(null, new GPS(), "Audimax", 6, System.currentTimeMillis(), true);
-        //Room iz105 = new Room(null, new GPS(52.273352, 10.524979), "IZ105", 2, "Thu, 20 Jun 2019 07:33:24 GMT", false);
-
-        addRoom(room1);
-        addRoom(room2);
-        addRoom(room3);
-        addRoom(room4);
-        addRoom(room5);
-        addRoom(room6);
-        //addRoom(room7);
-
-        ArrayList<Room> roomlist1 = new ArrayList<>();
-        roomlist1.add(room1);
-        roomlist1.add(room2);
-        roomlist1.add(room3);
-        roomlist1.add(room4);
-
-        ArrayList<Room> roomlist2 = new ArrayList<>();
-        roomlist2.add(room5);
-        roomlist2.add(room6);
-        roomlist2.add(room1);
-
-        ArrayList<Room> roomlist3 = new ArrayList<>();
-        roomlist3.add(room5);
-        roomlist3.add(room6);
-        roomlist3.add(room1);
-
-
-        Challenge challenge1 = new Challenge("MockChallenge 1", roomlist1, Calendar.getInstance().getTime().toString(), "null",  true);
-        Challenge challenge2 = new Challenge("MockChallenge 2", roomlist2, Calendar.getInstance().getTime().toString(), "null", false);
-        Challenge challenge3 = new Challenge("MockChallenge 3", roomlist3, Calendar.getInstance().getTime().toString(), "null", false);
-
-        addChallenge(challenge1);
-        addChallenge(challenge2);
-        addChallenge(challenge3);
     }
 
     /**
