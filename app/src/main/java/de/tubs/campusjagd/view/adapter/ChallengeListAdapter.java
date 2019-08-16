@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -21,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 import de.tubs.campusjagd.R;
 import de.tubs.campusjagd.model.Challenge;
 import de.tubs.campusjagd.model.Resources;
-import de.tubs.campusjagd.view.fragments.ChallengeListFragment;
 
 /**
  * Adapter holding our challenges
@@ -49,11 +47,6 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<RecyclerView.View
      * The expanded position
      */
     private int mExpandedPosition = -1;
-
-    /**
-     * The timer string to insert
-     */
-    private String mTimerString;
 
     /**
      * Constructor for the adaper
@@ -293,8 +286,8 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<RecyclerView.View
                     }
                 });
 
-                updateTime(challenge);
-                viewHolder.timerTextView.setText(mTimerString);
+
+                viewHolder.timerTextView.setText(formatTime(challenge));
                 break;
             }
         }
@@ -306,13 +299,13 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<RecyclerView.View
         return mChallenges.size();
     }
 
-    private void updateTime(Challenge challenge) {
+    public static String formatTime(Challenge challenge) {
 
             Date challengeStartDate = new Date(challenge.getTimestamp());
             Date now = new Date();
             long timeDifference_in_millis = now.getTime() - challengeStartDate.getTime();
 
-            mTimerString = hmsTimeFormatter(timeDifference_in_millis);
+            return hmsTimeFormatter(timeDifference_in_millis);
     }
 
     /**
@@ -322,7 +315,7 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<RecyclerView.View
      * @return HH:mm:ss time formatted string
      */
     @SuppressLint("DefaultLocale")
-    public static String hmsTimeFormatter(long milliSeconds) {
+    private static String hmsTimeFormatter(long milliSeconds) {
 
         String hms;
 

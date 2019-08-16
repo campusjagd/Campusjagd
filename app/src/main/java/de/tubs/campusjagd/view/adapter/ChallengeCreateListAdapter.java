@@ -169,9 +169,7 @@ public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCr
         });
 
         if (challenge.isTimedChallenge()) {
-            Date challengeEndTime = new Date(challenge.getEndTimeStamp());
-
-            holder.timeNeeded.setText(ChallengeListAdapter.hmsTimeFormatter(challengeEndTime.getTime()));
+            holder.timeNeeded.setText(ChallengeListAdapter.formatTime(challenge));
             holder.background.setBackgroundColor(mContext.getResources().getColor(R.color.colorPrimary));
         } else {
             holder.timeNeeded.setVisibility(View.GONE);
