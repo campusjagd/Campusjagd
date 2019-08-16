@@ -7,7 +7,7 @@ class ChallengeItem:
     title = ""
     official = ""
     rooms = ""
-    points = ""
+    points = 0
     id = ""
 
 @app.route('/')
@@ -30,8 +30,9 @@ def challenges():
         challenge_item.id = c.id
         challenge_item.official = c.official
         for r in c.rooms:
-            challenge_item.rooms += r.name
-            challenge_item.points += str(r.points)
+            challenge_item.rooms = challenge_item.rooms + r.name + ", "
+            challenge_item.points += r.points
+        challenge_item.rooms = challenge_item.rooms[:-2]
         challengelist.append(challenge_item)
     return render_template('challenges.html', challengelist = challengelist)
 
@@ -43,6 +44,7 @@ def scan_challenge(id):
     challenge_item.id = challenge.id
     challenge_item.official = challenge.official
     for r in challenge.rooms:
-        challenge_item.rooms += r.name
-        challenge_item.points += str(r.points)
+        challenge_item.rooms = challenge_item.rooms + r.name + ", "
+        challenge_item.points += r.points
+    challenge_item.rooms = challenge_item.rooms[:-2]
     return render_template('scanChallenge.html', c = challenge_item, challenge_object=challenge)
