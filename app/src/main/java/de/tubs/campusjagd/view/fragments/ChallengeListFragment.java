@@ -187,7 +187,7 @@ public class ChallengeListFragment extends Fragment implements CJLocationManager
                     //Toast.makeText(this.getContext(), "Barcode read: " + barcode.displayValue ,Toast.LENGTH_LONG).show();
                     // Give to Resources
                     Resources.getInstance(ChallengeListFragment.this.getContext()).handleBarcodeRead(barcode.displayValue);
-                    mAdapter.notifyDataSetChanged();
+                    mAdapter.updateChallenges(Resources.getInstance(ChallengeListFragment.this.getContext()).getAllChallenges());
                 } else {
                     Log.d(TAG, "No barcode captured, intent data is null");
                 }

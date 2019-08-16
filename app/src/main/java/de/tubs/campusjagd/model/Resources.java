@@ -3,6 +3,7 @@ package de.tubs.campusjagd.model;
 import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -523,42 +524,46 @@ public class Resources {
      * @param barcodeValue string encapsulated in the qr-code
      */
     public void handleBarcodeRead(String barcodeValue) {
-        if (barcodeValue.contains("rooms")){
-            //a json which contains infos of a challenge
-            try {
-                JSONObject jsonObject = new JSONObject(barcodeValue);
-                String challengeName = jsonObject.getString("name");
-                JSONArray jsonArray = jsonObject.getJSONArray("rooms");
-                List<Room> roomList = roomListFromJson(jsonArray);
-                for (Room room : roomList){
-                    addRoom(room);
+        try {
+            if (barcodeValue.contains("rooms")) {
+                //a json which contains infos of a challenge
+                try {
+                    JSONObject jsonObject = new JSONObject(barcodeValue);
+                    String challengeName = jsonObject.getString("name");
+                    JSONArray jsonArray = jsonObject.getJSONArray("rooms");
+                    List<Room> roomList = roomListFromJson(jsonArray);
+                    for (Room room : roomList) {
+                        addRoom(room);
+                    }
+                    Challenge challenge = new Challenge(challengeName, roomList, Calendar.getInstance().getTime().toString(), "null", false);
+                    addChallenge(challenge);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-                Challenge challenge = new Challenge(challengeName, roomList, Calendar.getInstance().getTime().toString(), "null", false);
-                addChallenge(challenge);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }else {
-            //barcode looks like:     name;long;lat;points;timestamp;
-            String[] values = barcodeValue.split(";");
-            String roomName = values[0];
-            String long_barcode = values[1];
-            double longitute = Double.parseDouble(long_barcode.split(":")[1]);
-            String lat_barcode = values[2];
-            double latitude = Double.parseDouble(lat_barcode.split(":")[1]);
-            String points = values[3];
-            String timestamp = values[4];
-            Cursor data = getSpecificRoom(roomName);
-            Room room = new Room(null, new GPS(latitude, longitute), roomName, Integer.parseInt(points), timestamp, true);
-            //if the room is not already known in the database, then it is added, if it is known it will
-            // be marked as found
-            if (data.getCount() == 0) {
-                //room does not already exist
-                addRoom(room);
             } else {
-                //room already exists
-                handleRoomFound(room);
+                //barcode looks like:     name;long;lat;points;timestamp;
+                String[] values = barcodeValue.split(";");
+                String roomName = values[0];
+                String long_barcode = values[1];
+                double longitute = Double.parseDouble(long_barcode.split(":")[1]);
+                String lat_barcode = values[2];
+                double latitude = Double.parseDouble(lat_barcode.split(":")[1]);
+                String points = values[3];
+                String timestamp = values[4];
+                Cursor data = getSpecificRoom(roomName);
+                Room room = new Room(null, new GPS(latitude, longitute), roomName, Integer.parseInt(points), timestamp, true);
+                //if the room is not already known in the database, then it is added, if it is known it will
+                // be marked as found
+                if (data.getCount() == 0) {
+                    //room does not already exist
+                    addRoom(room);
+                } else {
+                    //room already exists
+                    handleRoomFound(room);
+                }
             }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 

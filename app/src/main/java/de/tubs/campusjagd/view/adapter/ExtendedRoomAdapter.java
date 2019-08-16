@@ -96,8 +96,8 @@ public class ExtendedRoomAdapter extends RecyclerView.Adapter<ItemExtendedRoomVi
         // Bind holder with element from the list
         holder.roomName.setText(room.getName());
 
-        Date date = new Date(room.getTimestamp());
-        holder.timestamp.setText("Hinzugefügt am: " + date.getDay() + "." + date.getMonth() + "." + (date.getYear() + 1900));
+        String date = room.getTimestamp();
+        holder.timestamp.setText("Hinzugefügt am: " + date);
         holder.points.setText("Punkte: " + Integer.toString(room.getPoints()));
         holder.gpsPosition.setText(room.getGps().toString());
         holder.checkBox.setChecked(room.isRoomFound());

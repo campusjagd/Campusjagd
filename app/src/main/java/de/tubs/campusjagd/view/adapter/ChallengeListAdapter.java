@@ -48,6 +48,11 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<RecyclerView.View
      */
     private int mExpandedPosition = -1;
 
+    public void updateChallenges(List<Challenge> updatedList) {
+        this.mChallenges = updatedList;
+        this.notifyDataSetChanged();
+    }
+
     /**
      * Constructor for the adaper
      *
