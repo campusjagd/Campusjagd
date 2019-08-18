@@ -56,7 +56,29 @@
                                 <PersistentState>
                                   <option name="children">
                                     <map>
+                                      <entry key="foregroundClipArt">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="color" value="000000" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
                                       <entry key="foregroundImage">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="color" value="000000" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
+                                      <entry key="foregroundText">
                                         <value>
                                           <PersistentState>
                                             <option name="values">
@@ -71,7 +93,7 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="foregroundImage" value="$PROJECT_DIR$/logo/campusjagd-logo.svg" />
+                                      <entry key="foregroundImage" value="$PROJECT_DIR$/logo/campusjagd-logo.png" />
                                     </map>
                                   </option>
                                 </PersistentState>

@@ -103,12 +103,19 @@ public class MapsHelper {
      * @return {@link LatLngBounds.Builder} with points included
      */
     private LatLngBounds.Builder getCameraPositionBuilder(LatLngBounds.Builder builder) {
+        boolean nothingFound = true;
+
         for (Room room: mRooms) {
             if (room.isRoomFound()) {
                 builder.include(new LatLng(room.getGps().latitude, room.getGps().longitude));
-
+                nothingFound = false;
             }
         }
+
+        if (nothingFound) {
+            builder.include(new LatLng(52.273737, 10.528959));
+        }
+
         return builder;
     }
 

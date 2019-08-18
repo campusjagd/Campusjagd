@@ -15,10 +15,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.Date;
 import java.util.List;
 
 import de.tubs.campusjagd.R;
+import de.tubs.campusjagd.etc.Logger;
 import de.tubs.campusjagd.model.Challenge;
 import de.tubs.campusjagd.model.Resources;
 import de.tubs.campusjagd.nfc.SenderActivity;
@@ -30,7 +30,7 @@ import de.tubs.campusjagd.nfc.SenderActivity;
  *
  * @author leon.brettin@tu-bs.de
  */
-public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCreateViewHolder> {
+public class ChallengeCreateListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     /**
      * List of all challenges
@@ -73,44 +73,71 @@ public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCr
         this.notifyDataSetChanged();
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return mChallenges.get(position).isTimedChallenge() ? 1 : 0;
+    }
+
+    private int getItemPosition(Challenge challenge) {
+        return mChallenges.indexOf(challenge);
+    }
 
 
     @NonNull
     @Override
-    public ChallengeCreateViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
+    public ChallengeCreateViewHolderNoTimeChallenge onCreateViewHolder(@NonNull ViewGroup parent, int viewtype) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_challenge_create_card_item, parent, false);
 
-        return new ChallengeCreateViewHolder(v);
+        switch (viewtype){
+            case 0:
+                return new ChallengeCreateViewHolderNoTimeChallenge(v);
+            case 1:
+                return new ChallengeCreateViewHolderTimeChallenge(v);
+        }
+
+        throw new Error("You forgot to implement the new type of viewholder here");
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ChallengeCreateViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
         final Challenge challenge = mChallenges.get(position);
+        ChallengeCreateViewHolderNoTimeChallenge viewHolder;
 
-        holder.challengeName.setText(challenge.getName());
+        switch (holder.getItemViewType()) {
+            case 0:
+                 viewHolder = (ChallengeCreateViewHolderNoTimeChallenge)holder;
+                 viewHolder.timeNeeded.setVisibility(View.GONE);
+                 viewHolder.background.setBackgroundColor(mContext.getResources().getColor(R.color.white));
+                 break;
+            default:
+                viewHolder = (ChallengeCreateViewHolderTimeChallenge)holder;
+                viewHolder.timeNeeded.setText(ChallengeListAdapter.formatTime(challenge));
+                viewHolder.background.setBackgroundColor(mContext.getResources().getColor(R.color.colorPrimary));
+        }
+
+        viewHolder.challengeName.setText(challenge.getName());
 
         //Add rooms to roomlist
         // Set up recyclerview for rooms
         LinearLayoutManager llm = new LinearLayoutManager(mContext);
-        holder.recyclerView.setLayoutManager(llm);
-        holder.recyclerView.setHasFixedSize(false);
+        viewHolder.recyclerView.setLayoutManager(llm);
+        viewHolder.recyclerView.setHasFixedSize(false);
         // Bind adapter
-        holder.recyclerView.setAdapter(new RoomAdapter_NoCheckbox(challenge.getRoomList()));
+        viewHolder.recyclerView.setAdapter(new RoomAdapter_NoCheckbox(challenge.getRoomList()));
 
         // Expansion of challenge when you click on it
         final boolean isExpanded = position == mExpandedPosition;
-        holder.hiddenView.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+        viewHolder.hiddenView.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
         holder.itemView.setActivated(isExpanded);
-        final int itemposition = holder.getAdapterPosition();
+        final Challenge itemChallenge = challenge;
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mExpandedPosition = isExpanded ? -1 : itemposition;
+                mExpandedPosition = isExpanded ? -1 : getItemPosition(challenge);
 
                 // You can add a transition later with (But you have to implement stuff here later
                 //TransitionManager.beginDelayedTransition(mRecyclerView);
-
-                notifyItemChanged(itemposition);
+                notifyItemChanged(getItemPosition(challenge));
             }
         });
 
@@ -120,7 +147,7 @@ public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCr
         final String challengeStringRepresentation = mChallenges.get(position).getName();
 
         // Prepare sendFab to start peer to peer connection
-        holder.sendFab.setOnClickListener(new View.OnClickListener() {
+        viewHolder.sendFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 /*
@@ -146,7 +173,7 @@ public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCr
             }
         });
 
-        holder.deleteFab.setOnClickListener(new View.OnClickListener() {
+        viewHolder.deleteFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
@@ -158,9 +185,14 @@ public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCr
                         })
                         .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                Resources.getInstance(mContext).deleteChallenge(challenge.getName());
-                                ChallengeCreateListAdapter.this.mChallenges.remove(position);
-                                ChallengeCreateListAdapter.this.notifyItemRemoved(position);
+                                try {
+                                    Resources.getInstance(mContext).deleteChallenge(challenge.getName());
+                                    ChallengeCreateListAdapter.this.mChallenges.remove(position);
+                                    ChallengeCreateListAdapter.this.notifyItemRemoved(position);
+                                } catch (IndexOutOfBoundsException e) {
+                                    Logger.LogExeption(ChallengeCreateListAdapter.class.getSimpleName(), "Unable to remove last element", e);
+                                }
+
                             }
                         });
                 // Create the AlertDialog object and return it
@@ -169,14 +201,12 @@ public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCr
         });
 
         if (challenge.isTimedChallenge()) {
-            holder.timeNeeded.setText(ChallengeListAdapter.formatTime(challenge));
-            holder.background.setBackgroundColor(mContext.getResources().getColor(R.color.colorPrimary));
-        } else {
-            holder.timeNeeded.setVisibility(View.GONE);
-            holder.background.setBackgroundColor(mContext.getResources().getColor(R.color.white));
-        }
 
+        } else {
+
+        }
     }
+
 
     @Override
     public int getItemCount() {
@@ -187,7 +217,7 @@ public class ChallengeCreateListAdapter extends RecyclerView.Adapter<ChallengeCr
 /**
  * Viewholder for the challenge create fragment
  */
-class ChallengeCreateViewHolder extends RecyclerView.ViewHolder{
+class ChallengeCreateViewHolderNoTimeChallenge extends RecyclerView.ViewHolder{
 
     TextView challengeName;
     View hiddenView;
@@ -197,7 +227,7 @@ class ChallengeCreateViewHolder extends RecyclerView.ViewHolder{
     TextView timeNeeded;
     View background;
 
-    public ChallengeCreateViewHolder(@NonNull View itemView) {
+    public ChallengeCreateViewHolderNoTimeChallenge(@NonNull View itemView) {
         super(itemView);
 
         challengeName = itemView.findViewById(R.id.challenge_create_challenge_name);
@@ -207,5 +237,12 @@ class ChallengeCreateViewHolder extends RecyclerView.ViewHolder{
         deleteFab = itemView.findViewById(R.id.challenge_delete_fab);
         timeNeeded = itemView.findViewById(R.id.challenge_create_challenge_time);
         background = itemView.findViewById(R.id.challenge_create_challenge_item_background);
+    }
+}
+
+class ChallengeCreateViewHolderTimeChallenge extends ChallengeCreateViewHolderNoTimeChallenge {
+
+    public ChallengeCreateViewHolderTimeChallenge(@NonNull View itemView) {
+        super(itemView);
     }
 }
